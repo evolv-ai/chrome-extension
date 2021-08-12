@@ -1,0 +1,50 @@
+{
+  "name": "EvoTools",
+  "description": "Display data from Evolv AI",
+  "version": "1.0",
+  "manifest_version": 3,
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "webRequest",
+    "cookies", 
+    "system.storage", 
+    "system.memory"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
+      "all_frames": false,
+      "run_at": "document_end",
+      "include_globs": ["*"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "/images/evolv-logo.png",
+      "32": "/images/evolv-logo.png",
+      "48": "/images/evolv-logo.png",
+      "128": "/images/evolv-logo.png"
+    }
+  },
+  "icons": {
+    "16": "/images/evolv-logo.png",
+    "32": "/images/evolv-logo.png",
+    "48": "/images/evolv-logo.png",
+    "128": "/images/evolv-logo.png"
+  },
+  "options_page": "settings.html"
+}

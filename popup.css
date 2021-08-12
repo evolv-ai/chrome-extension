@@ -1,0 +1,104 @@
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 500px;
+}
+
+.row {
+  flex-direction: row;
+  width: 100%;
+}
+
+#header-row {
+  height: 60px;
+  background-color: gray;
+  width: 100%;
+  display: flex;
+}
+
+#header-row img {
+  height: 60px;
+}
+
+#experiment-section {
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  width: 100%;
+  text-align: center;
+  font-size: 1em;
+}
+/*//\\//\\//\\//\\//\\//\\//\\//\\*/
+
+ul#experiment_row {
+  width: 100%;
+  list-style: none;
+  margin: 5px;
+  padding-left: 0;
+}
+
+ul#experiment_row  li{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+ul#experiment_row  li p{
+  width: 175px;
+}
+
+/*/
+/\\//\\//\\//\\//\\//\\//\\//\\*/
+
+#user-secti {
+  border-top: 1px solid black;
+}
+
+ul#info-row {
+  margin: 0;
+  list-style: none;
+  margin: 0;
+  padding-inline-start: 0;
+}
+
+ul#info-row li.row {
+  height: 30px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  border-top: 1px solid #d8d8d8;
+  padding: 5px 0;
+  align-items: center;
+}
+
+ul#info-row li.row.disabled {
+  margin-top: 20px;
+}
+
+/* Label */
+ul#info-row span.label {
+  font-weight: 700;
+  font-size: 14px;
+  min-width: 130px;
+  display: flex;
+}
+
+/*  UID Button */
+ul#info-row button {
+  width: 400px;
+  margin: 5px auto;
+  background-color: orange;
+  display: block;
+}
+button.settings-icon {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+}
+
+button.settings-icon svg {
+  height: 20px;
+}
