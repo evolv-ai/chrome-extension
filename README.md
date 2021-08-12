@@ -14,6 +14,7 @@ Follow the instructions below to get up and running:
 ---
 
 ## Future Ideas 
+* Link to combinations in manager - need to get org id somehow
 * Options page
 * Force combo functionality
 * Log events triggered

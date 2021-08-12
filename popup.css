@@ -1,7 +1,12 @@
+body {
+  margin: 0;
+}
+
 .content-wrapper {
   display: flex;
   flex-direction: column;
   width: 500px;
+  overflow: hidden;
 }
 
 .row {
@@ -11,86 +16,23 @@
 
 #header-row {
   height: 60px;
-  background-color: gray;
+  background-color: rgba(232,79,62,1);
   width: 100%;
   display: flex;
+  color: #fff;
+}
+
+#header-row h1 {
+  align-self: center;
+  font-family: Helvetica, Arial, sans-serif;
+  margin-left: -15px;
+  margin-bottom: 12px;
 }
 
 #header-row img {
   height: 60px;
 }
 
-#experiment-section {
-  display: flex;
-  flex-direction: column;
-}
-
-h2 {
-  width: 100%;
-  text-align: center;
-  font-size: 1em;
-}
-/*//\\//\\//\\//\\//\\//\\//\\//\\*/
-
-ul#experiment_row {
-  width: 100%;
-  list-style: none;
-  margin: 5px;
-  padding-left: 0;
-}
-
-ul#experiment_row  li{
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-}
-ul#experiment_row  li p{
-  width: 175px;
-}
-
-/*/
-/\\//\\//\\//\\//\\//\\//\\//\\*/
-
-#user-secti {
-  border-top: 1px solid black;
-}
-
-ul#info-row {
-  margin: 0;
-  list-style: none;
-  margin: 0;
-  padding-inline-start: 0;
-}
-
-ul#info-row li.row {
-  height: 30px;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  border-top: 1px solid #d8d8d8;
-  padding: 5px 0;
-  align-items: center;
-}
-
-ul#info-row li.row.disabled {
-  margin-top: 20px;
-}
-
-/* Label */
-ul#info-row span.label {
-  font-weight: 700;
-  font-size: 14px;
-  min-width: 130px;
-  display: flex;
-}
-
-/*  UID Button */
-ul#info-row button {
-  width: 400px;
-  margin: 5px auto;
-  background-color: orange;
-  display: block;
-}
 button.settings-icon {
   position: absolute;
   top: 15px;
@@ -101,4 +43,65 @@ button.settings-icon {
 
 button.settings-icon svg {
   height: 20px;
+}
+
+#experiment-section {
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  width: 100%;
+  font-size: 1em;
+  background-color: #000;
+  color: #fff;
+  padding: 10px;
+  margin: 0;
+  font-family: Helvetica, Arial, sans-serif;
+}
+/*//\\//\\//\\//\\//\\//\\//\\//\\*/
+
+ul#experiment_row {
+  width: 100%;
+  list-style: none;
+  margin: 5px;
+  padding-left: 10px;
+}
+
+ul#experiment_row li{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  border-top: 1px solid #d8d8d8;
+}
+
+ul#experiment_row li.row:first-of-type {
+  border-top: none;
+}
+ul#experiment_row  li p{
+  width: 175px;
+}
+
+/*/
+/\\//\\//\\//\\//\\//\\//\\//\\*/
+
+/* #user-section {
+  border-top: 1px solid black;
+} */
+
+ul#info-row {
+  width: 100%;
+  list-style: none;
+  margin: 5px;
+  padding-left: 10px;
+}
+
+ul#info-row li.row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  border-top: 1px solid #d8d8d8;
+}
+ul#info-row li.row:first-of-type {
+  border-top: none;
 }
