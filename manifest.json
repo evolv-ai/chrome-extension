@@ -34,17 +34,17 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "/images/evolv-logo.png",
-      "32": "/images/evolv-logo.png",
-      "48": "/images/evolv-logo.png",
-      "128": "/images/evolv-logo.png"
+      "16": "/images/evolv-logo-orange.png",
+      "32": "/images/evolv-logo-orange.png",
+      "48": "/images/evolv-logo-orange.png",
+      "128": "/images/evolv-logo-orange.png"
     }
   },
   "icons": {
-    "16": "/images/evolv-logo.png",
-    "32": "/images/evolv-logo.png",
-    "48": "/images/evolv-logo.png",
-    "128": "/images/evolv-logo.png"
+    "16": "/images/evolv-logo-orange.png",
+    "32": "/images/evolv-logo-orange.png",
+    "48": "/images/evolv-logo-orange.png",
+    "128": "/images/evolv-logo-orange.png"
   },
   "options_page": "settings.html"
 }
