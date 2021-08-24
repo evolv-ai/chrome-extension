@@ -16,7 +16,7 @@ body {
 
 #header-row {
   height: 60px;
-  background-color: rgba(232,79,62,1);
+  background-color: rgba(232, 79, 62, 1);
   width: 100%;
   display: flex;
   color: #fff;
@@ -46,8 +46,7 @@ button.settings-icon svg {
 }
 
 #experiment-section {
-  display: flex;
-  flex-direction: column;
+  min-height: 50px;
 }
 
 h2 {
@@ -59,49 +58,110 @@ h2 {
   margin: 0;
   font-family: Helvetica, Arial, sans-serif;
 }
-/*//\\//\\//\\//\\//\\//\\//\\//\\*/
 
-ul#experiment_row {
+.row ul {
   width: 100%;
   list-style: none;
-  margin: 5px;
-  padding-left: 10px;
-}
-
-ul#experiment_row li{
-  width: 100%;
+  padding-left: 0;
   display: flex;
   flex-direction: row;
-  border-top: 1px solid #d8d8d8;
 }
 
-ul#experiment_row li.row:first-of-type {
-  border-top: none;
-}
-ul#experiment_row  li p{
-  width: 175px;
-}
-
-/*/
-/\\//\\//\\//\\//\\//\\//\\//\\*/
-
-/* #user-section {
-  border-top: 1px solid black;
-} */
-
-ul#info-row {
-  width: 100%;
-  list-style: none;
-  margin: 5px;
-  padding-left: 10px;
-}
-
-ul#info-row li.row {
-  width: 100%;
+.row ul li {
+  width: 50%;
   display: flex;
   flex-direction: row;
-  border-top: 1px solid #d8d8d8;
+  border-bottom: 1px solid #d8d8d8;
 }
-ul#info-row li.row:first-of-type {
-  border-top: none;
+
+.experiment_row ul {
+  width: 100%;
+  margin: 0;
+  padding-inline-start: 0;
+  display: flex;
+  /* flex-direction: row; */
+  list-style-type: none;
+  padding: 0 10px;
+}
+
+.experiment_row ul:first-of-type li {
+  width: 50%;
+  display: flex;
+  align-self: center;
+}
+
+ul li p {
+  display: flex;
+  flex-direction: row;
+}
+
+ul li p b {
+  margin-right: 10px;
+}
+
+ul.additional_info {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  background: #d8d8d8;
+}
+
+ul.additional_info li {
+  width: 100%;
+  line-height: 0;
+}
+ul.additional_info li p b {
+  min-width: 60px;
+}
+
+.hide-info ul.additional_info {
+  display: none;
+}
+
+.hide-info ul.additional_info {
+  display: none;
+}
+
+div.image-wrapper {
+  width: 20px;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  position: absolute;
+  right: 10px;
+  margin-top: 10px;
+}
+
+div.image-wrapper img {
+  height: 20px;
+}
+
+img.expand {
+  display: none;
+}
+
+.hide-info img.expand {
+  display: block;
+}
+
+.hide-info img.collapse {
+  display: none;
+}
+
+#user-section .row ul {
+  flex-direction: column;
+  margin: 0;
+}
+
+#user-section .row ul li {
+  width: 100% !important;
+}
+
+#user-section .row ul li p {
+  margin-left: 10px;
+}
+
+#user-section ul li p b {
+  margin-right: 10px;
+  min-width: 125px;
 }
