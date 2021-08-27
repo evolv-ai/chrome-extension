@@ -9,62 +9,54 @@
 // @grant        none
 // ==/UserScript==
 
-;(function () {
+;
+(function () {
   "use strict"
 
-  function run() {
-    let confirmedAllocations = [];
-    (function poll() {
-      if (!(window.evolv &&
-          window.evolv.context &&
-          window.evolv.context.remoteContext &&
-          window.evolv.context.remoteContext.confirmations)) {
-        return setTimeout(poll, 50);
-      }
-
-      let allocations = window.evolv.context.remoteContext.experiments.allocations;
-      let confirmations = window.evolv.context.remoteContext.confirmations;
-
-      for (let i = 0; i < allocations.length; i++) {
-        let allocation = allocations[i];
-        let allocationCID = allocation.cid;
-
-        for (let j = 0; j < confirmations.length; j++) {
-          let confirmationCID = confirmations[j].cid;
-          if (allocationCID === confirmationCID) {
-            confirmedAllocations.push(allocation);
-          }
+  let pollingSafetyNet = 0
+  document.addEventListener('DOMContentLoaded', (event) => {
+    function poll() {
+      if (pollingSafetyNet++ < 50) {
+        if (!(window.evolv &&
+            window.evolv.context &&
+            window.evolv.context.remoteContext &&
+            window.evolv.context.remoteContext.confirmations)) {
+          return setTimeout(poll, 50);
         }
       }
 
-      let allocationsJSON = JSON.stringify(confirmedAllocations);
-      window.sessionStorage.setItem("evolv:allocations", allocationsJSON);
+      // set the updated confirmations
+      window.sessionStorage.setItem("evolv:confirmations", JSON.stringify(window.evolv.context.remoteContext.confirmations));
+
+      // tell contentScript.js that we're ready for it to run
       window.dispatchEvent(new Event('run_content_script'));
-    })();
-  }
+    }
 
-  /**
-   * Handle SPA transitions
-   */
-  window.addEventListener('locationchange', function () {
-    run();
-  });
+    poll();
 
-  history.pushState = (f => function pushState() {
-    var ret = f.apply(this, arguments);
-    window.dispatchEvent(new Event('pushState'));
-    window.dispatchEvent(new Event('locationchange'));
-    return ret;
-  })(history.pushState);
+    /**
+     * Handle SPA transitions
+     */
+    window.addEventListener('locationchange', function () {
+      poll();
+    });
 
-  history.replaceState = (f => function replaceState() {
-    var ret = f.apply(this, arguments);
-    window.dispatchEvent(new Event('replaceState'));
-    window.dispatchEvent(new Event('locationchange'));
-    return ret;
-  })(history.replaceState);
+    history.pushState = (f => function pushState() {
+      var ret = f.apply(this, arguments);
+      window.dispatchEvent(new Event('pushState'));
+      window.dispatchEvent(new Event('locationchange'));
+      return ret;
+    })(history.pushState);
 
-  window.addEventListener('popstate', () => {
-    window.dispatchEvent(new Event('locationchange'))
+    history.replaceState = (f => function replaceState() {
+      var ret = f.apply(this, arguments);
+      window.dispatchEvent(new Event('replaceState'));
+      window.dispatchEvent(new Event('locationchange'));
+      return ret;
+    })(history.replaceState);
+
+    window.addEventListener('popstate', () => {
+      window.dispatchEvent(new Event('locationchange'))
+    });
   });
 })();

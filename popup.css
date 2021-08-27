@@ -84,6 +84,14 @@ h2 {
   padding: 0 10px;
 }
 
+.experiment_row {
+  color: grey;
+}
+
+.experiment_row.confirmed {
+  color: green;
+}
+
 .experiment_row ul:first-of-type li {
   width: 50%;
   display: flex;
