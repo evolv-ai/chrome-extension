@@ -23,7 +23,6 @@
   let pollingSafetyNet = 0
 
   function poll() {
-    console.log('hey brian polling...', pollingSafetyNet);
     if (pollingSafetyNet++ < 50) {
       if (!isEvolvLoaded()) {
         return setTimeout(poll, 50);
