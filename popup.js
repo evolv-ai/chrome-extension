@@ -16,6 +16,7 @@ function getConfirmationCIDs(confirmations) {
 }
 
 function run() {
+  console.log('hey brian run');
   waitForElement("#evolv_uid").then(function (uidInput) {
     waitForElement("#evolv_sid").then(function (sidInput) {
       waitForElement("#envID").then(function (envInput) {
@@ -79,6 +80,7 @@ function run() {
                   }).text();
                 }).then(result => {
                   let allocationsJSON = JSON.parse(result);
+                  console.log('hey brian allocationsJSON', allocationsJSON);
                   chrome.storage.sync.get(["evolv:confirmations"], function (confirmationsResult) {
                     let confirmationCIDs = getConfirmationCIDs(confirmationsResult["evolv:confirmations"]);
 
@@ -136,6 +138,8 @@ function run() {
   });
 }
 
+run();
+
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     if (request.message === "confirmations_updated") {
@@ -145,14 +149,14 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
-let refreshButton = document.getElementById('refreshButton');
-refreshButton.addEventListener('click', function (e) {
-  chrome.runtime.sendMessage({
-    message: "refresh_requested"
-  });
+// let refreshButton = document.getElementById('refreshButton');
+// refreshButton.addEventListener('click', function (e) {
+//   chrome.runtime.sendMessage({
+//     message: "refresh_requested"
+//   });
 
-  // send message to contentScript telling it to refresh our data
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {message: "refresh_requested"});
-  });
-});
+//   // send message to contentScript telling it to refresh our data
+//   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+//     chrome.tabs.sendMessage(tabs[0].id, {message: "refresh_requested"});
+//   });
+// });

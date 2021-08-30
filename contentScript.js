@@ -1,5 +1,4 @@
 function run() {
-    console.log('hey brian run content script');
     const waitForElement = async selector => {
         while (document.querySelector(selector) === null) {
             await new Promise(resolve => requestAnimationFrame(resolve))
