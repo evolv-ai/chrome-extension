@@ -29,8 +29,10 @@
       }
     } else{
       console.log('EvoTools: Evolv not loaded.');
+      window.dispatchEvent(new Event('flush_evotools_data'));
       return;
     }
+    window.dispatchEvent(new Event('flush_evotools_data'));
 
     // set the updated confirmations
     window.sessionStorage.setItem("evolv:confirmations", JSON.stringify(window.evolv.context.remoteContext.confirmations));

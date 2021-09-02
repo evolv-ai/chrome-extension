@@ -6,16 +6,25 @@ const waitForElement = async (selector) => {
   return document.querySelector(selector);
 };
 
-function getConfirmationCIDs(confirmations) {
+const getConfirmationCIDs = (confirmations) => {
   let confirmationCIDs = [];
   [].forEach.call(confirmations, function (confirmation) {
     let cid = confirmation.cid;
     confirmationCIDs.push(cid);
   });
   return confirmationCIDs;
-}
+};
+
+const removeAllocations = () => {
+  [].forEach.call(document.querySelectorAll('.experiment_row[data-allocation]'), function (allocation) {
+    allocation.remove();
+  });
+};
 
 function run() {
+  // each time this file runs, we should clear all existing allocations and recreate them to prevent stale allocations from being shown
+  removeAllocations();
+
   waitForElement("#evolv_uid").then(function (uidInput) {
     waitForElement("#evolv_sid").then(function (sidInput) {
       waitForElement("#envID").then(function (envInput) {
@@ -48,21 +57,17 @@ function run() {
                     start(controller) {
                       // The following function handles each data chunk
                       function push() {
-                        // "done" is a Boolean and value a "Uint8Array"
                         reader.read().then(({
                           done,
                           value
                         }) => {
                           // If there is no more data to read
                           if (done) {
-                            console.log('done', done);
                             controller.close();
                             return;
                           }
                           // Get the data and send it to the browser via the controller
                           controller.enqueue(value);
-                          // Check chunks by logging to the console
-                          console.log(done, value);
                           push();
                         })
                       }
@@ -86,7 +91,7 @@ function run() {
                       [].forEach.call(allocationsJSON, function (allocation) {
                         experimentList.insertAdjacentHTML(
                           "beforeend", `
-                            <div class="experiment_row hide-info ${confirmationCIDs.includes(allocation.cid) ? 'confirmed': ''}">
+                            <div class="experiment_row hide-info ${confirmationCIDs.includes(allocation.cid) ? 'confirmed': ''}" data-allocation="${allocation.cid}">
                               <ul>
                                 <li><p><b>Experiment ID:</b> <span class="eid">${allocation.eid}</span></p></li>
                                 <li>

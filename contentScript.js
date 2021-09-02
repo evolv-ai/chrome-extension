@@ -1,3 +1,13 @@
+const flushData = () => {
+    // reset values
+    chrome.storage.sync.set({
+        "envID": '(empty)',
+        "evolv:uid": '(empty)',
+        "evolv:sid": '(empty)',
+        "evolv:confirmations": '(empty)'
+    });
+};
+
 function run() {
     const waitForElement = async selector => {
         while (document.querySelector(selector) === null) {
@@ -44,7 +54,7 @@ function run() {
     chrome.storage.sync.set({
         "evolv:confirmations": confirmations
     });
-    
+
     // inform popup.js that the confirmations have been updated
     chrome.runtime.sendMessage({
         message: "confirmations_updated"
@@ -58,6 +68,12 @@ function run() {
     //     "evolv:candidateToken": candidateToken
     // });
 }
+
+// window event is triggered in tampermonkey.js indicating that our extension is ready to rock'n'roll
+window.addEventListener('flush_evotools_data', function () {
+    console.log('hey brian flush data');
+    flushData();
+});
 
 // window event is triggered in tampermonkey.js indicating that our extension is ready to rock'n'roll
 window.addEventListener('run_content_script', function () {
