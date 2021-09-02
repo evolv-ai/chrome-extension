@@ -71,7 +71,6 @@ function run() {
 
 // window event is triggered in tampermonkey.js indicating that our extension is ready to rock'n'roll
 window.addEventListener('flush_evotools_data', function () {
-    console.log('hey brian flush data');
     flushData();
 });
 
