@@ -4,11 +4,12 @@ const flushData = () => {
         "envID": '(empty)',
         "evolv:uid": '(empty)',
         "evolv:sid": '(empty)',
+        "evolv:allocations": '(empty)',
         "evolv:confirmations": '(empty)'
     });
 };
 
-function run() {
+const run = () => {
     const waitForElement = async selector => {
         while (document.querySelector(selector) === null) {
             await new Promise(resolve => requestAnimationFrame(resolve))
@@ -47,8 +48,17 @@ function run() {
     });
 
     /**
+     * Grab the allocations from sessionStorage and set it in chrome storage.
+     * The allocations are set by the evotools integration
+     */
+    let allocations = window.sessionStorage.getItem('evolv:allocations') || '';
+    chrome.storage.sync.set({
+        "evolv:allocations": allocations
+    });
+
+    /**
      * Grab the confirmations from sessionStorage and set it in chrome storage.
-     * The confirmations are set by the Tampermonkey script.
+     * The allocations are set by the evotools integration
      */
     let confirmations = JSON.parse(window.sessionStorage.getItem('evolv:confirmations')) || '';
     chrome.storage.sync.set({
@@ -56,9 +66,11 @@ function run() {
     });
 
     // inform popup.js that the confirmations have been updated
-    chrome.runtime.sendMessage({
-        message: "confirmations_updated"
-    });
+    setTimeout(function() {
+        chrome.runtime.sendMessage({
+            message: "confirmations_updated"
+        });
+    },0);
 
     // /**
     //  * Set the Candidate Token in Chrome storage
@@ -67,12 +79,16 @@ function run() {
     // chrome.storage.sync.set({
     //     "evolv:candidateToken": candidateToken
     // });
-}
+};
 
 // window event is triggered in tampermonkey.js indicating that our extension is ready to rock'n'roll
 window.addEventListener('flush_evotools_data', function () {
     flushData();
 });
+
+if (window.runContentScript) {
+    run();
+}
 
 // window event is triggered in tampermonkey.js indicating that our extension is ready to rock'n'roll
 window.addEventListener('run_content_script', function () {

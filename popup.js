@@ -22,7 +22,7 @@ const removeAllocations = () => {
 };
 
 function run() {
-  // each time this file runs, we should clear all existing allocations and recreate them to prevent stale allocations from being shown
+  // each time this function runs, we should clear all existing allocations and recreate them to prevent stale allocations from being shown
   removeAllocations();
 
   waitForElement("#evolv_uid").then(function (uidInput) {
@@ -49,41 +49,9 @@ function run() {
                 const environment_id = result["envID"]
                 envInput.textContent = environment_id;
 
-                const allocationsURL = `https://participants.evolv.ai/v1/${environment_id}/allocations?uid=${uid}&sid=${sid}`;
-                fetch(allocationsURL).then(response => response.body).then(rb => {
-                  const reader = rb.getReader();
+                chrome.storage.sync.get(["evolv:allocations"], function (allocationsResult) {
+                  let allocationsJSON = JSON.parse(allocationsResult["evolv:allocations"]);
 
-                  return new ReadableStream({
-                    start(controller) {
-                      // The following function handles each data chunk
-                      function push() {
-                        reader.read().then(({
-                          done,
-                          value
-                        }) => {
-                          // If there is no more data to read
-                          if (done) {
-                            controller.close();
-                            return;
-                          }
-                          // Get the data and send it to the browser via the controller
-                          controller.enqueue(value);
-                          push();
-                        })
-                      }
-
-                      push();
-                    }
-                  });
-                }).then(stream => {
-                  // Respond with our stream
-                  return new Response(stream, {
-                    headers: {
-                      "Content-Type": "text/html"
-                    }
-                  }).text();
-                }).then(result => {
-                  let allocationsJSON = JSON.parse(result);
                   chrome.storage.sync.get(["evolv:confirmations"], function (confirmationsResult) {
                     let confirmationCIDs = getConfirmationCIDs(confirmationsResult["evolv:confirmations"]);
 
@@ -114,7 +82,8 @@ function run() {
                       });
                     }
 
-                    let expandButtonWrapperElements = document.querySelectorAll('.image-wrapper');
+                    let expandButtonWrapperElements = document.querySelectorAll('.experiment_row ul li');
+                    // let expandButtonWrapperElements = document.querySelectorAll('.image-wrapper');
                     [].forEach.call(expandButtonWrapperElements, function (button) {
                       button.addEventListener('click', function (e) {
                         let experimentRowEl = e.target.closest('.experiment_row');
