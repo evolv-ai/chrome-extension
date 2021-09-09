@@ -75,6 +75,7 @@ function run() {
                                 <li><p><b>CID:</b> <span class="conf_cid">${allocation.cid}</span></p></li>
                                 <li><p><b>Group ID:</b> <span class="conf_group_id">${allocation.group_id}</span></p></li>
                                 <li><p><b>Excluded:</b> <span class="conf_excluded">${allocation.excluded}</span></p></li>
+                               <!-- <li><p><a href="https://app.evolv.ai/organizations/a576ebc5b6/deploy/c1325716de/projects/c651ddc1ec">Open in Manager</a></p></li> -->
                               </ul>
                             </div>
                           `
