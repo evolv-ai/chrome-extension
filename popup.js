@@ -30,9 +30,9 @@ function run() {
       waitForElement("#envID").then(function (envInput) {
         waitForElement("#experiment-section").then(function (experimentList) {
           // Set the User ID
-          chrome.storage.sync.get(["evolv:uid"], function (result) {
-            const uid = result["evolv:uid"];
-            if (result["evolv:uid"]) {
+          chrome.storage.sync.get(["evolv:uid"], function (resultUid) {
+            const uid = resultUid["evolv:uid"];
+            if (resultUid["evolv:uid"]) {
               uidInput.textContent = uid;
             }
 
@@ -41,19 +41,18 @@ function run() {
               const sid = resultSid["evolv:sid"];
               if (resultSid["evolv:sid"]) {
                 sidInput.textContent = sid;
-
               }
 
               // Set the Environment ID
-              chrome.storage.sync.get(["envID"], function (result) {
-                const environment_id = result["envID"]
+              chrome.storage.sync.get(["envID"], function (resultEnvId) {
+                const environment_id = resultEnvId["envID"]
                 envInput.textContent = environment_id;
 
-                chrome.storage.sync.get(["evolv:allocations"], function (allocationsResult) {
-                  let allocationsJSON = JSON.parse(allocationsResult["evolv:allocations"]);
+                chrome.storage.sync.get(["evolv:allocations"], function (resultAllocations) {
+                  let allocationsJSON = JSON.parse(resultAllocations["evolv:allocations"]);
 
-                  chrome.storage.sync.get(["evolv:confirmations"], function (confirmationsResult) {
-                    let confirmationCIDs = getConfirmationCIDs(confirmationsResult["evolv:confirmations"]);
+                  chrome.storage.sync.get(["evolv:confirmations"], function (resultConfirmations) {
+                    let confirmationCIDs = getConfirmationCIDs(resultConfirmations["evolv:confirmations"]);
 
                     if (allocationsJSON && allocationsJSON.length > 0) {
                       [].forEach.call(allocationsJSON, function (allocation) {
