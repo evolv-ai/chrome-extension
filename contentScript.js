@@ -1,14 +1,3 @@
-const flushData = () => {
-    // reset values
-    chrome.storage.sync.set({
-        "envID": '(empty)',
-        "evolv:uid": '(empty)',
-        "evolv:sid": '(empty)',
-        "evolv:allocations": '(empty)',
-        "evolv:confirmations": '(empty)'
-    });
-};
-
 const run = () => {
     const waitForElement = async selector => {
         while (document.querySelector(selector) === null) {
@@ -17,52 +6,27 @@ const run = () => {
         return document.querySelector(selector);
     };
 
+    let uid = window.localStorage.getItem('evolv:uid') || '(empty)';
+    let sid = window.sessionStorage.getItem('evolv:sid') || '(empty)';
+    let allocations = window.sessionStorage.getItem('evolv:allocations') || '(empty)';
+    let confirmations = JSON.parse(window.sessionStorage.getItem('evolv:confirmations')) || '(empty)';
+
     /**
      * Get the environmentID and set it in Chrome storage
      */
-    waitForElement('script[src*="participants.evolv.ai/v1/"]').then(el => {
-        let src = el.src;
+    waitForElement('script[src*="participants.evolv.ai/v1/"]').then(script => {
+        let src = script.src;
         let v1Index = src.indexOf('v1/');
         let envID = src.substr(v1Index + 3);
         let slashIndex = envID.indexOf('/');
         envID = envID.substr(0, slashIndex);
         chrome.storage.sync.set({
-            "envID": envID
+            "evolv:envId": envID,
+            "evolv:uid": uid,
+            "evolv:sid": sid,
+            "evolv:allocations": allocations,
+            "evolv:confirmations": confirmations
         });
-    });
-
-    /**
-     * Set the User ID in Chrome storage
-     */
-    let uid = window.localStorage.getItem('evolv:uid');
-    chrome.storage.sync.set({
-        "evolv:uid": uid
-    });
-
-    /**
-     * Set the Session ID in Chrome storage
-     */
-    let sid = window.sessionStorage.getItem('evolv:sid');
-    chrome.storage.sync.set({
-        "evolv:sid": sid
-    });
-
-    /**
-     * Grab the allocations from sessionStorage and set it in chrome storage.
-     * The allocations are set by the evotools integration
-     */
-    let allocations = window.sessionStorage.getItem('evolv:allocations') || '';
-    chrome.storage.sync.set({
-        "evolv:allocations": allocations
-    });
-
-    /**
-     * Grab the confirmations from sessionStorage and set it in chrome storage.
-     * The allocations are set by the evotools integration
-     */
-    let confirmations = JSON.parse(window.sessionStorage.getItem('evolv:confirmations')) || '';
-    chrome.storage.sync.set({
-        "evolv:confirmations": confirmations
     });
 
     // inform popup.js that the confirmations have been updated
@@ -71,21 +35,9 @@ const run = () => {
             message: "confirmations_updated"
         });
     },0);
-
-    // /**
-    //  * Set the Candidate Token in Chrome storage
-    //  */
-    // let candidateToken = window.sessionStorage.getItem('evolv:candidateToken');
-    // chrome.storage.sync.set({
-    //     "evolv:candidateToken": candidateToken
-    // });
 };
 
-// window event is triggered in tampermonkey.js indicating that our extension is ready to rock'n'roll
-window.addEventListener('flush_evotools_data', function () {
-    flushData();
-});
-
+// check to see if the `run_content_script` window event has already fired.
 if (window.runContentScript) {
     run();
 }
@@ -94,10 +46,3 @@ if (window.runContentScript) {
 window.addEventListener('run_content_script', function () {
     run();
 });
-
-chrome.runtime.onMessage.addListener(
-    function (request, sender, sendResponse) {
-        if (request.message === "refresh_requested")
-            run();
-    }
-);
