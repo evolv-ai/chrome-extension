@@ -38,11 +38,11 @@ const run = () => {
 };
 
 // check to see if the `run_content_script` window event has already fired.
-if (window.runContentScript) {
+if (window.runEvotoolsContentScript) {
     run();
 }
 
-// window event is triggered in tampermonkey.js indicating that our extension is ready to rock'n'roll
-window.addEventListener('run_content_script', function () {
+// window event is triggered in evotools.js integration indicating that our extension is ready to rock'n'roll
+window.addEventListener('run_evotools_content_script', function () {
     run();
 });

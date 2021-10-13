@@ -15,7 +15,8 @@ Follow the instructions below to get up and running:
 
 ## Future Ideas 
 * Add an 'opt-out' button to block evolv requests.
-* Link to combinations in manager - need to get org id somehow
+* Link to combinations in manager - need to get org id somehow and find a way to relate the phaseID to the projectID
 * Force combo functionality
 * Log events triggered
 * Replicate `Resource Override`'s script injection/redirect functionality to eliminate the need for that extension.
+* Messaging for reason that allocation was not confirmed.  For example, targeting doesn't match or audience requirements not met.
