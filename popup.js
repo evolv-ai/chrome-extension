@@ -1,7 +1,8 @@
 const removeAllocations = () => {
-  [].forEach.call(document.querySelectorAll('.experiment_row[data-allocation]'), function (allocation) {
-    allocation.remove();
-  });
+  let experimentList = document.getElementById('experiment-section')
+  console.log('hey brian experimentList', experimentList);
+
+  if (experimentList) experimentList.innerHTML = "";
 };
 
 // When the popup is opened, remove any existing allocations
@@ -30,8 +31,7 @@ const waitForElement = async (selector) => {
 const setUidValue = () => {
   waitForElement("#evolv_uid").then(function (uidInput) {
     chrome.storage.sync.get(["evolv:uid"], function (resultUid) {
-      const uidValue = resultUid["evolv:uid"];
-      uidInput.textContent = uidValue || '(not set)';
+      uidInput.textContent = resultUid["evolv:uid"] || '(not set)';
     });
   });
 };
@@ -117,13 +117,13 @@ const setAllocationsAndConfirmations = () => {
               );
             });
           }
-  
+
           handleExperimentRowClicks();
         });
       } else {
         experimentList.insertAdjacentHTML(
           "beforeend", `
-            <div class="experiment_row hide-info">
+            <div class="experiment_row hide-info" data-allocation="none">
               <p style="padding-left: 10px">No allocations</p>
             </div>
           `
@@ -148,6 +148,9 @@ chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     if (request.message === "confirmations_updated") {
       run();
+    } else if (request.message === "clear_allocations") {
+      console.log('hey brian clear allocations received');
+      removeAllocations();
     }
   }
 );

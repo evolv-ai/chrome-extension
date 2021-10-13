@@ -30,11 +30,11 @@ const run = () => {
     });
 
     // inform popup.js that the confirmations have been updated
-    setTimeout(function () {
+    // setTimeout(function () {
         chrome.runtime.sendMessage({
             message: "confirmations_updated"
         });
-    }, 0);
+    // }, 0);
 };
 
 // check to see if the `run_content_script` window event has already fired.
@@ -51,6 +51,10 @@ window.addEventListener('run_evotools_content_script', function () {
  * Handle SPA transitions
  */
 window.addEventListener('locationchange', function () {
+    chrome.runtime.sendMessage({
+        message: "clear_allocations"
+    });
+    
     run();
 });
 
