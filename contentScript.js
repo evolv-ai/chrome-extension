@@ -31,9 +31,9 @@ const run = () => {
 
     // inform popup.js that the confirmations have been updated
     // setTimeout(function () {
-        chrome.runtime.sendMessage({
-            message: "confirmations_updated"
-        });
+    chrome.runtime.sendMessage({
+        message: "confirmations_updated"
+    });
     // }, 0);
 };
 
@@ -50,11 +50,12 @@ window.addEventListener('run_evotools_content_script', function () {
 /**
  * Handle SPA transitions
  */
+
 window.addEventListener('locationchange', function () {
     chrome.runtime.sendMessage({
         message: "clear_allocations"
     });
-    
+
     run();
 });
 
@@ -74,4 +75,11 @@ history.replaceState = (f => function replaceState() {
 
 window.addEventListener('popstate', () => {
     window.dispatchEvent(new Event('locationchange'))
+});
+
+var observer = new MutationObserver(function (mutations) {
+    window.dispatchEvent(new Event('locationchange'));
+});
+observer.observe(document.documentElement, {
+    attributes: true
 });
