@@ -1,23 +1,30 @@
+const removeAllocations = () => {
+  [].forEach.call(document.querySelectorAll('.experiment_row[data-allocation]'), function (allocation) {
+    allocation.remove();
+  });
+};
+
+// When the popup is opened, remove any existing allocations
+removeAllocations();
+
+window.dispatchEvent(new Event('run_evotools_content_script'));
+
+const getConfirmationCIDs = (confirmations) => {
+  console.log('hey brian confirmations', confirmations);
+  let confirmationCIDs = [];
+  if (confirmations !== "(empty)") {
+    [].forEach.call(JSON.parse(confirmations), function (confirmation) {
+      let cid = confirmation.cid;
+      confirmationCIDs.push(cid);
+    });
+  }
+  return confirmationCIDs;
+};
 const waitForElement = async (selector) => {
   while (document.querySelector(selector) === null) {
     await new Promise((resolve) => requestAnimationFrame(resolve));
   }
   return document.querySelector(selector);
-};
-
-const getConfirmationCIDs = (confirmations) => {
-  let confirmationCIDs = [];
-  [].forEach.call(confirmations, function (confirmation) {
-    let cid = confirmation.cid;
-    confirmationCIDs.push(cid);
-  });
-  return confirmationCIDs;
-};
-
-const removeAllocations = () => {
-  [].forEach.call(document.querySelectorAll('.experiment_row[data-allocation]'), function (allocation) {
-    allocation.remove();
-  });
 };
 
 const setUidValue = () => {
@@ -71,42 +78,57 @@ const handleSettingsButtonClicks = () => {
 
 const setAllocationsAndConfirmations = () => {
   waitForElement("#experiment-section").then(function (experimentList) {
+    console.log('hey brian experimentList:', experimentList);
+
     chrome.storage.sync.get(["evolv:allocations"], function (resultAllocations) {
+      console.log('hey brian resultAllocations', resultAllocations);
       let allocationsString = resultAllocations["evolv:allocations"];
-      let allocationsJSON = JSON.parse(allocationsString);
+      console.log('hey brian allocationsString', allocationsString);
 
-      chrome.storage.sync.get(["evolv:confirmations"], function (resultConfirmations) {
-        let confirmationCIDs = getConfirmationCIDs(resultConfirmations["evolv:confirmations"]);
+      if (allocationsString !== "(empty)") {
+        let allocationsJSON = JSON.parse(allocationsString);
 
-        if (allocationsJSON && allocationsJSON.length > 0) {
-          [].forEach.call(allocationsJSON, function (allocation) {
-            experimentList.insertAdjacentHTML(
-              "beforeend", `
-                <div class="experiment_row hide-info ${confirmationCIDs.includes(allocation.cid) ? 'confirmed': ''}" data-allocation="${allocation.cid}">
-                  <ul>
-                    <li><p><b>Experiment ID:</b> <span class="eid">${allocation.eid}</span></p></li>
-                    <li>
-                      <p><b>Ordinal:</b> <span class="ordinal">${allocation.ordinal}</span></p>
-                      <div class="image-wrapper">
-                        <img class="expand" src="https://img.icons8.com/ios/50/000000/expand-arrow.png"/>
-                        <img class="collapse" src="https://img.icons8.com/ios/50/000000/collapse-arrow.png"/>
-                      </div>
-                    </li>
-                  </ul>
-                  <ul class="additional_info">
-                    <li><p><b>UID:</b> <span class="conf_uid">${allocation.uid}</span></p></li>
-                    <li><p><b>CID:</b> <span class="conf_cid">${allocation.cid}</span></p></li>
-                    <li><p><b>Group ID:</b> <span class="conf_group_id">${allocation.group_id}</span></p></li>
-                    <li><p><b>Excluded:</b> <span class="conf_excluded">${allocation.excluded}</span></p></li>
-                  </ul>
-                </div>
-              `
-            );
-          });
-        }
-
-        handleExperimentRowClicks();
-      });
+        chrome.storage.sync.get(["evolv:confirmations"], function (resultConfirmations) {
+          let confirmationCIDs = getConfirmationCIDs(resultConfirmations["evolv:confirmations"]);
+          console.log('hey brian confirmationCIDs', confirmationCIDs);
+          if (allocationsJSON && allocationsJSON.length > 0) {
+            [].forEach.call(allocationsJSON, function (allocation) {
+              experimentList.insertAdjacentHTML(
+                "beforeend", `
+                  <div class="experiment_row hide-info ${confirmationCIDs.includes(allocation.cid) ? 'confirmed': ''}" data-allocation="${allocation.cid}">
+                    <ul>
+                      <li><p><b>Experiment ID:</b> <span class="eid">${allocation.eid}</span></p></li>
+                      <li>
+                        <p><b>Ordinal:</b> <span class="ordinal">${allocation.ordinal}</span></p>
+                        <div class="image-wrapper">
+                          <img class="expand" src="https://img.icons8.com/ios/50/000000/expand-arrow.png"/>
+                          <img class="collapse" src="https://img.icons8.com/ios/50/000000/collapse-arrow.png"/>
+                        </div>
+                      </li>
+                    </ul>
+                    <ul class="additional_info">
+                      <li><p><b>UID:</b> <span class="conf_uid">${allocation.uid}</span></p></li>
+                      <li><p><b>CID:</b> <span class="conf_cid">${allocation.cid}</span></p></li>
+                      <li><p><b>Group ID:</b> <span class="conf_group_id">${allocation.group_id}</span></p></li>
+                      <li><p><b>Excluded:</b> <span class="conf_excluded">${allocation.excluded}</span></p></li>
+                    </ul>
+                  </div>
+                `
+              );
+            });
+          }
+  
+          handleExperimentRowClicks();
+        });
+      } else {
+        experimentList.insertAdjacentHTML(
+          "beforeend", `
+            <div class="experiment_row hide-info">
+              <p style="padding-left: 10px">No allocations</p>
+            </div>
+          `
+        );
+      }
     });
   });
 };

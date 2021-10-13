@@ -8,8 +8,8 @@ const run = () => {
 
     let uid = window.localStorage.getItem('evolv:uid') || '(empty)';
     let sid = window.sessionStorage.getItem('evolv:sid') || '(empty)';
-    let allocations = window.sessionStorage.getItem('evolv:allocations') || '(empty)';
-    let confirmations = JSON.parse(window.sessionStorage.getItem('evolv:confirmations')) || '(empty)';
+    let allocations = window.sessionStorage.getItem('evolv:allocations') !== "(empty)" ? window.sessionStorage.getItem('evolv:allocations') : '(empty)';
+    let confirmations = window.sessionStorage.getItem('evolv:confirmations') !== "(empty)" ? window.sessionStorage.getItem('evolv:confirmations') : '(empty)';
 
     /**
      * Get the environmentID and set it in Chrome storage
@@ -30,11 +30,11 @@ const run = () => {
     });
 
     // inform popup.js that the confirmations have been updated
-    setTimeout(function() {
+    setTimeout(function () {
         chrome.runtime.sendMessage({
             message: "confirmations_updated"
         });
-    },0);
+    }, 0);
 };
 
 // check to see if the `run_content_script` window event has already fired.
@@ -45,4 +45,29 @@ if (window.runEvotoolsContentScript) {
 // window event is triggered in evotools.js integration indicating that our extension is ready to rock'n'roll
 window.addEventListener('run_evotools_content_script', function () {
     run();
+});
+
+/**
+ * Handle SPA transitions
+ */
+window.addEventListener('locationchange', function () {
+    run();
+});
+
+history.pushState = (f => function pushState() {
+    var ret = f.apply(this, arguments);
+    window.dispatchEvent(new Event('pushState'));
+    window.dispatchEvent(new Event('locationchange'));
+    return ret;
+})(history.pushState);
+
+history.replaceState = (f => function replaceState() {
+    var ret = f.apply(this, arguments);
+    window.dispatchEvent(new Event('replaceState'));
+    window.dispatchEvent(new Event('locationchange'));
+    return ret;
+})(history.replaceState);
+
+window.addEventListener('popstate', () => {
+    window.dispatchEvent(new Event('locationchange'))
 });
