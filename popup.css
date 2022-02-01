@@ -45,6 +45,22 @@ button.settings-icon svg {
   height: 20px;
 }
 
+button.refresh-icon {
+  position: absolute;
+  top: 15px;
+  right: 50px;
+  background: transparent;
+  border: none;
+}
+
+.additional_info a {
+  color: #000;
+}
+
+.additional_info a:visited {
+  color: #000;
+}
+
 #experiment-section {
   min-height: 50px;
 }
