@@ -53,6 +53,11 @@ const setSidValue = () => {
   });
 };
 
+const setQaAudienceEnabled = (qaAudienceEnabled) => {
+  let qaInput = document.querySelector('#evolv_qaAudienceEnabled');
+  qaInput.textContent = qaAudienceEnabled;
+};
+
 const setEnvironmentValue = () => {
   waitForElement("#envID").then(function (envInput) {
     chrome.storage.sync.get(["evolv:envId"], function (resultEnvId) {
@@ -93,25 +98,30 @@ const setAllocationsAndConfirmations = () => {
 
     chrome.storage.sync.get(["evoTools:remoteContext"], function (rc) {
       remoteContext = rc["evoTools:remoteContext"] !== '(empty)' ? JSON.parse(rc["evoTools:remoteContext"]) : rc["evoTools:remoteContext"];
-      let allocations = remoteContext.experiments.allocations;
-      let confirmations = remoteContext.experiments.confirmations;
-      let confirmationCIDs = getConfirmationCIDs(confirmations);
-      if (remoteContext.experiments.allocations.length > 0) {
-        Array.prototype.forEach.call(allocations, function (allocation) {
-          // TODO figure out a way to get these values
-          // let organizationId = 'ca93a6b80d';
-          // let projectId = '92d0fe50ce';
-          // let experimentName = 'Opt 11 Prospect Gridwall';
-
-          // let managerExperimentURL = `https://app.evolv.ai/organizations/${organizationId}/deploy/${environmentId}/projects/${projectId}`;
-          // let managerCombinationURL = `https://app.evolv.ai/${organizationId}/deploy/${environmentId}/projects/${projectId}/combinations/${allocation.cid}/view`;
-          // <!-- <li><p><a href="${managerExperimentURL}" target="_blank"><b>View Experiment in Evolv Manager</b></a></p></li> -->
-          // <!-- <li><p><a href="${managerCombinationURL}" target="_blank"><b>View Combination in Evolv Manager</b></a></p></li> -->
-
-          // check to make sure the experiment row doesn't already exist
-          if (!document.querySelector(`.experiment_row[data-allocation="${allocation.cid}"]`)) {
-            experimentList.insertAdjacentHTML(
-              "beforeend", `
+      if (remoteContext && remoteContext.config && remoteContext.experiments) {
+        let qaAudienceEnabled = remoteContext.config.qaAudienceEnabled;
+        setQaAudienceEnabled(!!qaAudienceEnabled);
+  
+        let allocations = remoteContext.experiments.allocations;
+        let confirmations = remoteContext.experiments.confirmations;
+        let confirmationCIDs = getConfirmationCIDs(confirmations);
+  
+        if (allocations.length > 0) {
+          Array.prototype.forEach.call(allocations, function (allocation) {
+            // TODO figure out a way to get these values
+            // let organizationId = 'ca93a6b80d';
+            // let projectId = '92d0fe50ce';
+            // let experimentName = 'Opt 11 Prospect Gridwall';
+  
+            // let managerExperimentURL = `https://app.evolv.ai/organizations/${organizationId}/deploy/${environmentId}/projects/${projectId}`;
+            // let managerCombinationURL = `https://app.evolv.ai/${organizationId}/deploy/${environmentId}/projects/${projectId}/combinations/${allocation.cid}/view`;
+            // <!-- <li><p><a href="${managerExperimentURL}" target="_blank"><b>View Experiment in Evolv Manager</b></a></p></li> -->
+            // <!-- <li><p><a href="${managerCombinationURL}" target="_blank"><b>View Combination in Evolv Manager</b></a></p></li> -->
+  
+            // check to make sure the experiment row doesn't already exist
+            if (!document.querySelector(`.experiment_row[data-allocation="${allocation.cid}"]`)) {
+              experimentList.insertAdjacentHTML(
+                "beforeend", `
                   <div class="experiment_row hide-info ${confirmationCIDs.includes(allocation.cid) ? 'confirmed': ''}" data-allocation="${allocation.cid}">
                     <ul>
                       <li><p><b>Experiment ID:</b> <span class="eid">${allocation.eid}</span></p></li>
@@ -132,20 +142,21 @@ const setAllocationsAndConfirmations = () => {
                     </ul>
                   </div>
                 `
-            );
+              );
+            }
+          });
+  
+          let noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
+          if (noAllocationsEl) {
+            noAllocationsEl.remove();
           }
-        });
-
-        let noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
-        if (noAllocationsEl) {
-          noAllocationsEl.remove();
-        }
-
-        handleExperimentRowClicks();
-      } else {
-        let noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
-        if (experimentList && !noAllocationsEl) {
-          experimentList.insertAdjacentHTML("beforeend", `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No allocations</p></div>`);
+  
+          handleExperimentRowClicks();
+        } else {
+          let noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
+          if (experimentList && !noAllocationsEl) {
+            experimentList.insertAdjacentHTML("beforeend", `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No allocations</p></div>`);
+          }
         }
       }
     });
@@ -156,6 +167,7 @@ const setAllocationsAndConfirmations = () => {
 const handleDebugButtonClicks = function () {
   waitForElement('#copy-debug-info').then(function (debugButton) {
     debugButton.addEventListener('click', function () {
+      // add remoteContext string to the clipboard
       var data = [new ClipboardItem({ "text/plain": new Blob([JSON.stringify(remoteContext)], { type: "text/plain" }) })];
       navigator.clipboard.write(data);
   
