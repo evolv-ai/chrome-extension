@@ -78,7 +78,7 @@ window.evolv.client.on('contaminated', event => {
     console.info('Contaminated: ', event)
 });
 
-window.evolv.client.on('event.emitted', event => {
-    console.info('Event Emitted: ', event)
+window.evolv.client.on('event.emitted', (event, event2) => {
+    console.info('Event Emitted: ', event2);
 });
 

@@ -6,6 +6,7 @@ const waitForElement = async selector => {
 };
 
 const run = () => {
+    // initialize storage to be empty
     chrome.storage.sync.set({
         "evolv:envId": '',
         "evolv:uid": '',
@@ -15,33 +16,30 @@ const run = () => {
         "evolv:blockExecution": ''
     });
 
+    // tell popup.js to clear the allocation data
     chrome.runtime.sendMessage({
         message: "clear_data"
     });
 
     let uid = window.localStorage.getItem('evolv:uid') || '(empty)';
     let sid = window.sessionStorage.getItem('evolv:sid') || '(empty)';
-    let allocations = window.sessionStorage.getItem('evolv:allocations') !== "(empty)" ? window.sessionStorage.getItem('evolv:allocations') : '(empty)';
-    let confirmations = window.sessionStorage.getItem('evolv:confirmations') !== "(empty)" ? window.sessionStorage.getItem('evolv:confirmations') : '(empty)';
-    
+    let remoteContext = window.sessionStorage.getItem('evoTools:remoteContext');
+
     waitForElement('script[src*="participants.evolv.ai/v1/"]').then(script => {
         let src = script.src;
         let v1Index = src.indexOf('v1/');
-
         let envID = src.substr(v1Index + 3);
         let slashIndex = envID.indexOf('/');
         envID = envID.substr(0, slashIndex);
 
-        let executionBlocked = window.sessionStorage.getItem('evolv:blockExecution') && window.sessionStorage.getItem('evolv:blockExecution') === 'true';
-
-        chrome.storage.sync.set({
+        evoStore = {
             "evolv:envId": envID,
             "evolv:uid": uid,
             "evolv:sid": sid,
-            "evolv:allocations": allocations,
-            "evolv:confirmations": confirmations,
-            "evolv:blockExecution": executionBlocked
-        });
+            "evoTools:remoteContext": remoteContext
+        };
+
+        chrome.storage.sync.set(evoStore);
 
         // inform popup.js that the confirmations have been updated
         chrome.runtime.sendMessage({
@@ -62,35 +60,11 @@ window.addEventListener('run_evotools_content_script', function () {
     run();
 });
 
+// listen for messages from popup.js
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         if (request.message === 'run_evotools_content_script') {
             run();
-        }
+        } 
     }
 );
-
-/**
- * Handle SPA transitions
- */
-window.addEventListener('locationchange', function () {
-    run();
-});
-
-history.pushState = (f => function pushState() {
-    var ret = f.apply(this, arguments);
-    window.dispatchEvent(new Event('pushState'));
-    window.dispatchEvent(new Event('locationchange'));
-    return ret;
-})(history.pushState);
-
-history.replaceState = (f => function replaceState() {
-    var ret = f.apply(this, arguments);
-    window.dispatchEvent(new Event('replaceState'));
-    window.dispatchEvent(new Event('locationchange'));
-    return ret;
-})(history.replaceState);
-
-window.addEventListener('popstate', () => {
-    window.dispatchEvent(new Event('locationchange'))
-});
