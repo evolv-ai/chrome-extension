@@ -1,3 +1,6 @@
+window.sessionStorage.setItem('evoToolsEnabled', true);
+
+
 const waitForElement = async selector => {
     while (!document.querySelector(selector)) {
         await new Promise(resolve => requestAnimationFrame(resolve))

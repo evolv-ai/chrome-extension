@@ -5,7 +5,8 @@ function processConfirmations() {
             window.evolv.context.remoteContext !== undefined &&
             window.evolv.context.remoteContext.confirmations !== undefined &&
             window.evolv.context.remoteContext.experiments !== undefined &&
-            window.evolv.context.remoteContext.experiments.allocations !== undefined;
+            window.evolv.context.remoteContext.experiments.allocations !== undefined &&
+            !!window.sessionStorage.getItem('evoToolsEnabled'); // make sure evoTools exists
     }
 
     var pollingSafetyNet = 0;
