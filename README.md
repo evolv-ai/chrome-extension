@@ -4,16 +4,17 @@
 ## Getting Started
 ---
 #### **1)** In this Github project, click the green `Code` button and choose `Download ZIP`.  Save the zip file somewhere that you're not going to delete it by accident.  Once downloaded, open the zip file and you should see a directory named `evotools-main`.
-<img src="https://imgur.com/tiNQrFd.png"/>
+<img src="https://imgur.com/8hvUBj4.png"/>
 
 ---
 
 #### **2)** In Chrome, navigate to `chrome://extensions/` and enable `Developer mode` in the top right corner of the extensions page.
-<img src="https://imgur.com/ZRuTnzz.png"/>
+<img src="https://imgur.com/tiNQrFd.png"/>
 
 ---
 
 #### **3)** Click the `Load Unpacked` button.  Select the `evotools-main` directory from step 1.    
+<img src="https://imgur.com/ZRuTnzz.png"/>
 <img src="https://imgur.com/ZyoiPfz.png"/>
 
 ---
