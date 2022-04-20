@@ -6,7 +6,10 @@
 //     let [tab] = await chrome.tabs.query(queryOptions);
 //     return tab;
 // }
-
+// console.log('hey brian views', views);
+// chrome.runtime.sendMessage({
+//     data: "update_popup"
+// });
 // console.log('hey brian getCurrentTab', getCurrentTab());
 
 
@@ -48,7 +51,6 @@
 //     details: InjectDetails,
 //     callback: function,
 //   );
-
 
 
 

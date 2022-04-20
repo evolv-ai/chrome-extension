@@ -45,12 +45,17 @@ run();
 
 // this gets fired in evotools.js - https://gist.github.com/briannorman/153fb3d7cf8b170514343063cc2e43b5
 // window event is triggered in evotools.js integration indicating that our extension is ready to rock'n'roll
-window.addEventListener('run_evotools_content_script', run);
+window.addEventListener('run_evotools_content_script', function() {
+    run();
+    console.log('hey brian run_evotools_content_script');
+});
 
-function onMessage (request, sender, sendResponse) {
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({
         status: true
     });
+
     switch (request.message) {
         case 'refresh_data':
             // the locationchange event causes the manager integration to rerun
@@ -64,5 +69,11 @@ function onMessage (request, sender, sendResponse) {
             window.sessionStorage.setItem('evolv:blockExecution', true);
             window.location.reload();
             break;
-    }    
-}
+    }
+});
+
+// TODO  need to figure out how to only send message when popup is open
+    // // listen for messages from popup.js
+    // chrome.runtime.sendMessage({
+    //     data: "update_popup"
+    // });

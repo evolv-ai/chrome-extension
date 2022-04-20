@@ -17,7 +17,6 @@ const sendMessageToContentJS = function (message) {
   });
 };
 
-sendMessageToContentJS('refresh_data')
 
 const removeAllocations = () => {
   let experimentSection = document.getElementById('experiment-section')
@@ -113,7 +112,7 @@ const setAllocationsAndConfirmations = () => {
         if (confirmations) {
           confirmationCIDs = getConfirmationCIDs(confirmations);
         }
-        
+
         if (allocations.length > 0) {
           for (let i = 0; i < allocations.length; i++) {
             let allocation = allocations[i];
@@ -203,14 +202,18 @@ const setBlockExecutionStatus = () => {
       } else {
         toggleInput.checked = false;
       }
-      
-      toggleInput.addEventListener('click', function(e) {
+
+      toggleInput.addEventListener('click', function (e) {
+        removeAllocations();
         if (toggleInput.checked) {
           sendMessageToContentJS('disable_evolv');
         } else {
           sendMessageToContentJS('enable_evolv');
+          setTimeout(() => {
+            run();
+          }, 3000)
         }
-      })
+      });
     });
   });
 };
@@ -222,7 +225,17 @@ let run = () => {
   setEnvironmentValue();
   setAllocationsAndConfirmations();
   // handleSettingsButtonClicks();
-  handleDebugButtonClicks(); 
+  handleDebugButtonClicks();
 }
 
 run();
+
+sendMessageToContentJS('refresh_data');
+
+
+// chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+//   console.log('hey brian message', message.data);
+//   sendResponse({
+//     status: true
+//   });
+// });
