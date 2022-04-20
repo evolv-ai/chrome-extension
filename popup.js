@@ -17,17 +17,18 @@ const sendMessageToContentJS = function (message) {
   });
 };
 
-// tell contentScript.js to run - this might not be needed as content.js should run immediately on page load
-sendMessageToContentJS('run_evotools_content_script')
+sendMessageToContentJS('refresh_data')
 
 const removeAllocations = () => {
   let experimentSection = document.getElementById('experiment-section')
   let noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
   if (experimentSection && !noAllocationsEl)
-  experimentSection.innerHTML = `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No allocations</p></div>`;
+    experimentSection.innerHTML = `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No allocations</p></div>`;
 };
 
 const getConfirmationCIDs = (confirmations) => {
+  if (!confirmations) return null;
+
   let confirmationCIDs = [];
   Array.prototype.forEach.call(confirmations, function (confirmation) {
     let cid = confirmation.cid;
@@ -90,34 +91,42 @@ const handleSettingsButtonClicks = () => {
   });
 };
 
+const setQaAudience = remoteContext => {
+  if (remoteContext.config && remoteContext.config.qaAudienceEnabled) {
+    let qaAudienceEnabled = remoteContext.config.qaAudienceEnabled;
+    setQaAudienceEnabled(!!qaAudienceEnabled);
+  }
+};
+
 let remoteContext;
 const setAllocationsAndConfirmations = () => {
   waitForElement("#experiment-section").then(function (experimentList) {
-    // chrome.storage.sync.get(["evolv:envId"], function (envId) {
-    //   let environmentId = envId["evolv:envId"];
-
     chrome.storage.sync.get(["evoTools:remoteContext"], function (rc) {
       remoteContext = rc["evoTools:remoteContext"] !== '(empty)' ? JSON.parse(rc["evoTools:remoteContext"]) : rc["evoTools:remoteContext"];
-      if (remoteContext && remoteContext.config && remoteContext.experiments) {
-        let qaAudienceEnabled = remoteContext.config.qaAudienceEnabled;
-        setQaAudienceEnabled(!!qaAudienceEnabled);
-  
+      if (remoteContext && remoteContext.experiments && remoteContext.experiments.allocations) {
+        setQaAudience(remoteContext);
+
         let allocations = remoteContext.experiments.allocations;
         let confirmations = remoteContext.experiments.confirmations;
-        let confirmationCIDs = getConfirmationCIDs(confirmations);
-  
+
+        let confirmationCIDs = [];
+        if (confirmations) {
+          confirmationCIDs = getConfirmationCIDs(confirmations);
+        }
+        
         if (allocations.length > 0) {
-          Array.prototype.forEach.call(allocations, function (allocation) {
+          for (let i = 0; i < allocations.length; i++) {
+            let allocation = allocations[i];
             // TODO figure out a way to get these values
             // let organizationId = 'ca93a6b80d';
             // let projectId = '92d0fe50ce';
             // let experimentName = 'Opt 11 Prospect Gridwall';
-  
+
             // let managerExperimentURL = `https://app.evolv.ai/organizations/${organizationId}/deploy/${environmentId}/projects/${projectId}`;
             // let managerCombinationURL = `https://app.evolv.ai/${organizationId}/deploy/${environmentId}/projects/${projectId}/combinations/${allocation.cid}/view`;
             // <!-- <li><p><a href="${managerExperimentURL}" target="_blank"><b>View Experiment in Evolv Manager</b></a></p></li> -->
             // <!-- <li><p><a href="${managerCombinationURL}" target="_blank"><b>View Combination in Evolv Manager</b></a></p></li> -->
-  
+
             // check to make sure the experiment row doesn't already exist
             if (!document.querySelector(`.experiment_row[data-allocation="${allocation.cid}"]`)) {
               experimentList.insertAdjacentHTML(
@@ -144,13 +153,13 @@ const setAllocationsAndConfirmations = () => {
                 `
               );
             }
-          });
-  
+          }
+
           let noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
           if (noAllocationsEl) {
             noAllocationsEl.remove();
           }
-  
+
           handleExperimentRowClicks();
         } else {
           let noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
@@ -161,45 +170,65 @@ const setAllocationsAndConfirmations = () => {
       }
     });
   });
-  // });
 };
 
-const handleDebugButtonClicks = function () {
+const handleDebugButtonClicks = () => {
   waitForElement('#copy-debug-info').then(function (debugButton) {
     debugButton.addEventListener('click', function () {
       // add remoteContext string to the clipboard
-      var data = [new ClipboardItem({ "text/plain": new Blob([JSON.stringify(remoteContext)], { type: "text/plain" }) })];
+      var data = [new ClipboardItem({
+        "text/plain": new Blob([JSON.stringify(remoteContext)], {
+          type: "text/plain"
+        })
+      })];
       navigator.clipboard.write(data);
-  
+
       debugButton.classList.add('copied');
       debugButton.textContent = "Copied!";
-      
-      setTimeout(function(){
+
+      setTimeout(function () {
         debugButton.classList.remove('copied');
         debugButton.textContent = "Copy Debug Info";
-      },1500);
+      }, 1500);
+    });
+  });
+};
+
+const setBlockExecutionStatus = () => {
+  waitForElement("#block-execution-toggle input").then(function (toggleInput) {
+    chrome.storage.sync.get(["evolv:blockExecution"], function (blockExecution) {
+      const blockExecutionValue = blockExecution["evolv:blockExecution"];
+
+      console.log('hey brian blockExecutionValue && typeof blockExecutionValue !== string');
+      if (blockExecutionValue && typeof blockExecutionValue !== 'string') {
+        toggleInput.checked = true;
+      } else {
+        toggleInput.checked = false;
+      }
+      
+      toggleInput.addEventListener('click', function(e) {
+        if (toggleInput.checked) {
+          console.log('hey brian checked');
+          sendMessageToContentJS('disable_evolv');
+        } else {
+          console.log('hey brian not checked');
+          sendMessageToContentJS('enable_evolv');
+        }
+      })
     });
   });
 };
 
 let run = () => {
+  setBlockExecutionStatus();
   setUidValue();
   setSidValue();
   setEnvironmentValue();
   setAllocationsAndConfirmations();
-  handleSettingsButtonClicks();
+  // handleSettingsButtonClicks();
   handleDebugButtonClicks();
+  
+  
 }
 
-// listen for contentScript.js to tell us that it has set up the data
-// and we're ready to display it
-chrome.runtime.onMessage.addListener(
-  function (request, sender, sendResponse) {
-    if (request.message === "confirmations_updated") {
-      removeAllocations();
-      run();
-    } else if (request.message === "clear_data") {
-      removeAllocations();
-    }
-  }
-);
+run();

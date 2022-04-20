@@ -13,7 +13,8 @@
     "webRequest",
     "cookies", 
     "system.storage", 
-    "system.memory"
+    "system.memory",
+    "webNavigation"
   ],
   "content_scripts": [
     {
@@ -24,12 +25,12 @@
         "contentScript.js"
       ],
       "all_frames": false,
-      "run_at": "document_end",
+      "run_at": "document_start",
       "include_globs": ["*"]
     }
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "/background.js"
   },
   "action": {
     "default_popup": "popup.html",
