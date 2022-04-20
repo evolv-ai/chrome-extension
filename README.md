@@ -52,7 +52,7 @@
 ---
 
 
-This extension is still in the very early stages and hasn't been widely used so use it at your own risk.  Report any issues or feature requests to brian.norman@evolv.ai.
+This extension is still in the very early stages and hasn't been widely used so please report any issues or feature requests to brian.norman@evolv.ai.
 
 ---
 
@@ -70,7 +70,6 @@ This extension is still in the very early stages and hasn't been widely used so 
 ## Future Ideas 
 * Get extension into the Chrome store so that the install process is quick and easy.
 * Convince Rob to add remoteContext to `sessionStorage` so that we can eliminate the need for the integration.
-* Add a 'Disable Evolv' button to block evolv requests for easily viewing BAU.
 * Log events as they are triggered.
 * Link each combinations to the experiment in the manager - need to get orgID and projectId somehow in order to create a link
 * List audiences user has qualified for

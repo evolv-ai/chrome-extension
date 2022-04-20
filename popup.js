@@ -198,8 +198,6 @@ const setBlockExecutionStatus = () => {
   waitForElement("#block-execution-toggle input").then(function (toggleInput) {
     chrome.storage.sync.get(["evolv:blockExecution"], function (blockExecution) {
       const blockExecutionValue = blockExecution["evolv:blockExecution"];
-
-      console.log('hey brian blockExecutionValue && typeof blockExecutionValue !== string');
       if (blockExecutionValue && typeof blockExecutionValue !== 'string') {
         toggleInput.checked = true;
       } else {
@@ -208,10 +206,8 @@ const setBlockExecutionStatus = () => {
       
       toggleInput.addEventListener('click', function(e) {
         if (toggleInput.checked) {
-          console.log('hey brian checked');
           sendMessageToContentJS('disable_evolv');
         } else {
-          console.log('hey brian not checked');
           sendMessageToContentJS('enable_evolv');
         }
       })
@@ -226,9 +222,7 @@ let run = () => {
   setEnvironmentValue();
   setAllocationsAndConfirmations();
   // handleSettingsButtonClicks();
-  handleDebugButtonClicks();
-  
-  
+  handleDebugButtonClicks(); 
 }
 
 run();

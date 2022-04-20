@@ -45,12 +45,12 @@ run();
 
 // this gets fired in evotools.js - https://gist.github.com/briannorman/153fb3d7cf8b170514343063cc2e43b5
 // window event is triggered in evotools.js integration indicating that our extension is ready to rock'n'roll
-window.addEventListener('run_evotools_content_script', function () {
-    run();
-});
+window.addEventListener('run_evotools_content_script', run);
 
-// listen for messages from popup.js
-chrome.runtime.onMessage.addListener(function (request) {
+function onMessage (request, sender, sendResponse) {
+    sendResponse({
+        status: true
+    });
     switch (request.message) {
         case 'refresh_data':
             // the locationchange event causes the manager integration to rerun
@@ -64,5 +64,5 @@ chrome.runtime.onMessage.addListener(function (request) {
             window.sessionStorage.setItem('evolv:blockExecution', true);
             window.location.reload();
             break;
-    }
-});
+    }    
+}

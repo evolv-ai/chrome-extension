@@ -7,18 +7,8 @@
 //     return tab;
 // }
 
-
-
 // console.log('hey brian getCurrentTab', getCurrentTab());
 
-// chrome.runtime.onInstalled.addListener(function () {
-//     console.log('hey brian onInstalled');
-//     // chrome.contextMenus.create({
-//     //     "id": "sampleContextMenu",
-//     //     "title": "Sample Context Menu",
-//     //     "contexts": ["selection"]
-//     // });
-// });
 
 
 // chrome.webNavigation.onCompleted.addListener(function () {
@@ -40,6 +30,7 @@
 
 
 // chrome.storage.onChanged.addListener(function (changes, namespace) {
+//     console.log('hey brian storage changed');
 //     for (let [key, {
 //             oldValue,
 //             newValue
