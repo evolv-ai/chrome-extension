@@ -17,7 +17,6 @@ const sendMessageToContentJS = function (message) {
   });
 };
 
-
 const removeAllocations = () => {
   let experimentSection = document.getElementById('experiment-section')
   let noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
@@ -53,10 +52,7 @@ const setSidValue = () => {
   });
 };
 
-const setQaAudienceEnabled = (qaAudienceEnabled) => {
-  let qaInput = document.querySelector('#evolv_qaAudienceEnabled');
-  qaInput.textContent = qaAudienceEnabled;
-};
+
 
 const setEnvironmentValue = () => {
   waitForElement("#envID").then(function (envInput) {
@@ -90,12 +86,20 @@ const handleSettingsButtonClicks = () => {
   });
 };
 
-const setQaAudience = remoteContext => {
-  if (remoteContext.config && remoteContext.config.qaAudienceEnabled) {
-    let qaAudienceEnabled = remoteContext.config.qaAudienceEnabled;
-    setQaAudienceEnabled(!!qaAudienceEnabled);
-  }
-};
+
+//
+// FYI - this doesn't currently get set in the remoteContext as you might expect 
+//
+// const setQaAudienceEnabled = (qaAudienceEnabled) => {
+//   let qaInput = document.querySelector('#evolv_qaAudienceEnabled');
+//   qaInput.textContent = qaAudienceEnabled;
+// };
+// const setQaAudience = remoteContext => {\
+//   if (remoteContext.config) {
+//     let qaAudienceEnabled = remoteContext.config.qaAudienceEnabled;
+//     setQaAudienceEnabled(!!qaAudienceEnabled);
+//   }
+// };
 
 let remoteContext;
 const setAllocationsAndConfirmations = () => {
@@ -103,7 +107,7 @@ const setAllocationsAndConfirmations = () => {
     chrome.storage.sync.get(["evoTools:remoteContext"], function (rc) {
       remoteContext = rc["evoTools:remoteContext"] !== '(empty)' ? JSON.parse(rc["evoTools:remoteContext"]) : rc["evoTools:remoteContext"];
       if (remoteContext && remoteContext.experiments && remoteContext.experiments.allocations) {
-        setQaAudience(remoteContext);
+        // setQaAudience(remoteContext);
 
         let allocations = remoteContext.experiments.allocations;
         let confirmations = remoteContext.experiments.confirmations;

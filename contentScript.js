@@ -73,7 +73,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 // TODO  need to figure out how to only send message when popup is open
-    // // listen for messages from popup.js
-    // chrome.runtime.sendMessage({
-    //     data: "update_popup"
-    // });
+// // listen for messages from popup.js
+// chrome.runtime.sendMessage({
+//     data: "update_popup"
+// });
