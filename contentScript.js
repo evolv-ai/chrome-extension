@@ -47,7 +47,7 @@ run();
 // window event is triggered in evotools.js integration indicating that our extension is ready to rock'n'roll
 window.addEventListener('run_evotools_content_script', function() {
     run();
-    console.log('hey brian run_evotools_content_script');
+    // console.log('hey brian run_evotools_content_script');
 });
 
 
