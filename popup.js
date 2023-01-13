@@ -5,14 +5,15 @@ const waitForElement = async (selector) => {
   return document.querySelector(selector);
 };
 
-const sendMessageToContentJS = function (message) {
+const sendMessageToContentJS = function (message, data) {
   chrome.tabs.query({
     currentWindow: true,
     active: true
   }, function (tabs) {
     var activeTab = tabs[0];
     chrome.tabs.sendMessage(activeTab.id, {
-      "message": message
+      message,
+      data
     });
   });
 };
@@ -42,17 +43,6 @@ const setUidValue = () => {
     });
   });
 };
-
-const setSidValue = () => {
-  waitForElement("#evolv_sid").then(function (sidInput) {
-    chrome.storage.sync.get(["evolv:sid"], function (resultSid) {
-      const sidValue = resultSid["evolv:sid"];
-      sidInput.textContent = sidValue || '(not set)';
-    });
-  });
-};
-
-
 
 const setEnvironmentValue = () => {
   waitForElement("#envID").then(function (envInput) {
@@ -105,7 +95,7 @@ let remoteContext;
 const setAllocationsAndConfirmations = () => {
   waitForElement("#experiment-section").then(function (experimentList) {
     chrome.storage.sync.get(["evoTools:remoteContext"], function (rc) {
-      remoteContext = rc["evoTools:remoteContext"] !== '(empty)' ? JSON.parse(rc["evoTools:remoteContext"]) : rc["evoTools:remoteContext"];
+      remoteContext = rc["evoTools:remoteContext"];
       if (remoteContext && remoteContext.experiments && remoteContext.experiments.allocations) {
         // setQaAudience(remoteContext);
 
@@ -225,7 +215,6 @@ const setBlockExecutionStatus = () => {
 let run = () => {
   setBlockExecutionStatus();
   setUidValue();
-  setSidValue();
   setEnvironmentValue();
   setAllocationsAndConfirmations();
   // handleSettingsButtonClicks();
