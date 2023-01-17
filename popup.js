@@ -54,9 +54,9 @@ const setEnvironmentValue = () => {
 };
 
 const handleExperimentRowClicks = () => {
-  let experimentRows = document.querySelectorAll('.experiment_row ul li');
-  Array.prototype.forEach.call(experimentRows, function (rowLi) {
-    rowLi.addEventListener('click', function (e) {
+  let experimentRows = document.querySelectorAll('.experiment-title-bar');
+  Array.prototype.forEach.call(experimentRows, function (titleBar) {
+    titleBar.addEventListener('click', function (e) {
       let experimentRowEl = e.target.closest('.experiment_row');
       if (experimentRowEl) {
         experimentRowEl.classList.contains('hide-info') ? experimentRowEl.classList.remove('hide-info') : experimentRowEl.classList.add('hide-info');
@@ -125,13 +125,14 @@ const setAllocationsAndConfirmations = () => {
               experimentList.insertAdjacentHTML(
                 "beforeend", `
                   <div class="experiment_row hide-info ${confirmationCIDs.includes(allocation.cid) ? 'confirmed': ''}" data-allocation="${allocation.cid}">
-                    <ul>
+                    <ul class="experiment-title-bar">
                       <li><p><b>Experiment ID:</b> <span class="eid">${allocation.eid}</span></p></li>
                       <li>
                         <p><b>Combination:</b> <span class="ordinal">${allocation.ordinal}</span></p>
-                        <div class="image-wrapper">
-                          <img class="expand" src="https://img.icons8.com/ios/50/000000/expand-arrow.png"/>
-                          <img class="collapse" src="https://img.icons8.com/ios/50/000000/collapse-arrow.png"/>
+                        <div class="arrow-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="9" viewBox="0 0 12 9" fill="none">
+                            <path d="M10.6 0.624994L12 2.02499L6 8.02499L5.24537e-07 2.02499L1.4 0.624993L6 5.22499L10.6 0.624994Z" fill="#666666"/>
+                          </svg>
                         </div>
                       </li>
                     </ul>

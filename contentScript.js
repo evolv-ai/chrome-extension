@@ -1,8 +1,6 @@
 const injectScript = () => {
     var script = document.createElement('script');
     script.src = chrome.runtime.getURL('injectScript.js');
-    // script.setAttribute('data-exid', chrome.runtime.id);
-    // script.id= 'evolvTools';
     document.body.appendChild(script);
 }
 
@@ -49,7 +47,6 @@ run();
 // window event is triggered in evotools.js integration indicating that our extension is ready to rock'n'roll
 window.addEventListener('run_evotools_content_script', function() {
     run();
-    // console.log('hey brian run_evotools_content_script');
 });
 
 
@@ -73,9 +70,3 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             break;
     }
 });
-
-// TODO  need to figure out how to only send message when popup is open
-// // listen for messages from popup.js
-// chrome.runtime.sendMessage({
-//     data: "update_popup"
-// });
