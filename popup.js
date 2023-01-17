@@ -5,14 +5,15 @@ const waitForElement = async (selector) => {
   return document.querySelector(selector);
 };
 
-const sendMessageToContentJS = function (message) {
+const sendMessageToContentJS = function (message, data) {
   chrome.tabs.query({
     currentWindow: true,
     active: true
   }, function (tabs) {
     var activeTab = tabs[0];
     chrome.tabs.sendMessage(activeTab.id, {
-      "message": message
+      message,
+      data
     });
   });
 };
@@ -43,17 +44,6 @@ const setUidValue = () => {
   });
 };
 
-const setSidValue = () => {
-  waitForElement("#evolv_sid").then(function (sidInput) {
-    chrome.storage.sync.get(["evolv:sid"], function (resultSid) {
-      const sidValue = resultSid["evolv:sid"];
-      sidInput.textContent = sidValue || '(not set)';
-    });
-  });
-};
-
-
-
 const setEnvironmentValue = () => {
   waitForElement("#envID").then(function (envInput) {
     chrome.storage.sync.get(["evolv:envId"], function (resultEnvId) {
@@ -64,9 +54,9 @@ const setEnvironmentValue = () => {
 };
 
 const handleExperimentRowClicks = () => {
-  let experimentRows = document.querySelectorAll('.experiment_row ul li');
-  Array.prototype.forEach.call(experimentRows, function (rowLi) {
-    rowLi.addEventListener('click', function (e) {
+  let experimentRows = document.querySelectorAll('.experiment-title-bar');
+  Array.prototype.forEach.call(experimentRows, function (titleBar) {
+    titleBar.addEventListener('click', function (e) {
       let experimentRowEl = e.target.closest('.experiment_row');
       if (experimentRowEl) {
         experimentRowEl.classList.contains('hide-info') ? experimentRowEl.classList.remove('hide-info') : experimentRowEl.classList.add('hide-info');
@@ -105,7 +95,7 @@ let remoteContext;
 const setAllocationsAndConfirmations = () => {
   waitForElement("#experiment-section").then(function (experimentList) {
     chrome.storage.sync.get(["evoTools:remoteContext"], function (rc) {
-      remoteContext = rc["evoTools:remoteContext"] !== '(empty)' ? JSON.parse(rc["evoTools:remoteContext"]) : rc["evoTools:remoteContext"];
+      remoteContext = rc["evoTools:remoteContext"];
       if (remoteContext && remoteContext.experiments && remoteContext.experiments.allocations) {
         // setQaAudience(remoteContext);
 
@@ -135,13 +125,14 @@ const setAllocationsAndConfirmations = () => {
               experimentList.insertAdjacentHTML(
                 "beforeend", `
                   <div class="experiment_row hide-info ${confirmationCIDs.includes(allocation.cid) ? 'confirmed': ''}" data-allocation="${allocation.cid}">
-                    <ul>
+                    <ul class="experiment-title-bar">
                       <li><p><b>Experiment ID:</b> <span class="eid">${allocation.eid}</span></p></li>
                       <li>
                         <p><b>Combination:</b> <span class="ordinal">${allocation.ordinal}</span></p>
-                        <div class="image-wrapper">
-                          <img class="expand" src="https://img.icons8.com/ios/50/000000/expand-arrow.png"/>
-                          <img class="collapse" src="https://img.icons8.com/ios/50/000000/collapse-arrow.png"/>
+                        <div class="arrow-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="9" viewBox="0 0 12 9" fill="none">
+                            <path d="M10.6 0.624994L12 2.02499L6 8.02499L5.24537e-07 2.02499L1.4 0.624993L6 5.22499L10.6 0.624994Z" fill="#666666"/>
+                          </svg>
                         </div>
                       </li>
                     </ul>
@@ -225,7 +216,6 @@ const setBlockExecutionStatus = () => {
 let run = () => {
   setBlockExecutionStatus();
   setUidValue();
-  setSidValue();
   setEnvironmentValue();
   setAllocationsAndConfirmations();
   // handleSettingsButtonClicks();

@@ -1,4 +1,8 @@
-window.sessionStorage.setItem('evoToolsEnabled', true);
+const injectScript = () => {
+    var script = document.createElement('script');
+    script.src = chrome.runtime.getURL('injectScript.js');
+    document.body.appendChild(script);
+}
 
 const waitForElement = async selector => {
     while (document.querySelector(selector) === null) {
@@ -8,18 +12,22 @@ const waitForElement = async selector => {
 };
 
 const run = () => {
-    let uid = window.localStorage.getItem('evolv:uid') || '(empty)';
-    let sid = window.sessionStorage.getItem('evolv:sid') || '(empty)';
-    let remoteContext = window.sessionStorage.getItem('evoTools:remoteContext');
-    let blockExecution = !!window.sessionStorage.getItem('evolv:blockExecution') && window.sessionStorage.getItem('evolv:blockExecution') !== 'false';
+    window.addEventListener("load", (event) => {
+        injectScript()
+        window.addEventListener('message', (e) => {
+            if(typeof e.data !== 'object' || e.data.source !== 'evolvTools') {
+                return
+            }
 
-    // initialize storage to be empty
+            switch (e.data.type) {
+                case 'evolv:context':
+                    chrome.storage.sync.set({ "evoTools:remoteContext": e.data.data })
+            }
+        });
+    });
+
     chrome.storage.sync.set({
-        "evolv:envId": '',
-        "evolv:uid": uid,
-        "evolv:sid": sid,
-        "evoTools:remoteContext": remoteContext,
-        "evolv:blockExecution": blockExecution
+        "evolv:uid": window.localStorage.getItem('evolv:uid') || '(empty)',
     });
 
     waitForElement('script[src*="participants.evolv.ai/v1/"]').then(script => {
@@ -29,15 +37,7 @@ const run = () => {
         let slashIndex = envID.indexOf('/');
         envID = envID.substr(0, slashIndex);
 
-        evoStore = {
-            "evolv:envId": envID,
-            "evolv:uid": uid,
-            "evolv:sid": sid,
-            "evoTools:remoteContext": remoteContext,
-            "evolv:blockExecution": blockExecution
-        };
-
-        chrome.storage.sync.set(evoStore);
+        chrome.storage.sync.set({"evolv:envId": envID});
     });
 };
 
@@ -47,7 +47,6 @@ run();
 // window event is triggered in evotools.js integration indicating that our extension is ready to rock'n'roll
 window.addEventListener('run_evotools_content_script', function() {
     run();
-    // console.log('hey brian run_evotools_content_script');
 });
 
 
@@ -62,18 +61,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             window.dispatchEvent(new Event('locationchange'));
             break;
         case 'enable_evolv':
-            window.sessionStorage.removeItem('evolv:blockExecution');
+            chrome.storage.sync.remove('evolv:blockExecution');
             window.location.reload();
             break;
         case 'disable_evolv':
-            window.sessionStorage.setItem('evolv:blockExecution', true);
+            chrome.storage.sync.set({'evolv:blockExecution': true});
             window.location.reload();
             break;
     }
 });
-
-// TODO  need to figure out how to only send message when popup is open
-// // listen for messages from popup.js
-// chrome.runtime.sendMessage({
-//     data: "update_popup"
-// });

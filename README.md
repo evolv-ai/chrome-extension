@@ -24,8 +24,7 @@
 
 ---
 
-#### **5)** Next, we need to add an integration in the Evolv Manager that sets up some data in `sessionStorage`.  Unfortunately, the extension can't access `window.evolv` but it can access `sessionStorage`.  Navigate to the `Integrations` page and click the `New Custom Integration` button.
-<img src="https://imgur.com/HWaA2br.png"/>
+#### **5)** We use `injectScript.js` to get the evolv remotecontext and send it to `evolvTool`. We actually have a bridge between webpage and `contentScript` to transfer data. We also can transfer data between `contentScript` and background as internal communication to make a complete data flow.
 
 ---
 

@@ -29,6 +29,10 @@
       "include_globs": ["*"]
     }
   ],
+  "web_accessible_resources": [{
+    "resources": ["injectScript.js"],
+    "matches": ["<all_urls>"]
+  }],
   "background": {
     "service_worker": "/background.js"
   },
