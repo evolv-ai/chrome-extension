@@ -1,6 +1,7 @@
 :root {
   --header-height: 46px;
   --green-success: #71C97E;
+  --main-font-color: #000000;
 }
 
 body {
@@ -56,11 +57,11 @@ button.refresh-icon {
 }
 
 .additional_info a {
-  color: #000;
+  color: var(--main-font-color);
 }
 
 .additional_info a:visited {
-  color: #000;
+  color: var(--main-font-color);
 }
 
 #copy-debug-info {
@@ -130,13 +131,13 @@ h2 {
   border-bottom: 1px solid #d8d8d8;
 }
 
-.section-header {
+.section-header, .experiment-title-bar {
   box-shadow: 0px 4px 4px -2px #000;
   -webkit-box-shadow: 0px 4px 4px -2px #000;
+  border-bottom: none;
 }
 
 .experiment_row ul {
-  width: 100%;
   margin: 0;
   padding-inline-start: 0;
   display: flex;
@@ -146,15 +147,16 @@ h2 {
 }
 
 .experiment_row {
-  color: grey;
+  color: var(--main-font-color);
+  overflow: hidden;
 }
 
 .experiment_row.confirmed {
-  color: green;
+  color: var(--green-success);
 }
 
 .experiment_row ul:first-of-type li {
-  width: 50%;
+  min-width: 70%;
   display: flex;
   align-self: center;
 }
@@ -169,10 +171,13 @@ ul li p b {
 }
 
 ul.additional_info {
+  padding: 8px 12px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  background: #d8d8d8;
+  background: #f4f4f4;
+  transition: all .3s ease;
+  height: 100%;
 }
 
 ul.additional_info li {
@@ -185,37 +190,36 @@ ul.additional_info li p b {
 }
 
 .hide-info ul.additional_info {
-  display: none;
+  height: 0px;
+  padding: 0px 12px;
 }
 
-.hide-info ul.additional_info {
-  display: none;
+.hide-info .experiment-title-bar {
+  border-bottom: 2px solid #333333;
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
 
-div.image-wrapper {
-  width: 20px;
+.experiment-title-bar {
+  position: relative;
+  cursor: pointer;
+}
+
+.arrow-icon {
   display: flex;
   align-items: center;
   padding-left: 10px;
-  position: absolute;
-  right: 10px;
-  margin-top: 10px;
+  margin-right: 10px;
+  flex: 1;
 }
 
-div.image-wrapper img {
-  height: 20px;
+.hide-info .arrow-icon svg {
+  transform: rotate(0deg);
 }
 
-img.expand {
-  display: none;
-}
-
-.hide-info img.expand {
-  display: block;
-}
-
-.hide-info img.collapse {
-  display: none;
+.arrow-icon svg {
+  transform: rotate(180deg);
+  transition: transform .3s ease;
 }
 
 #user-section .row ul {
