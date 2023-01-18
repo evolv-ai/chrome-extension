@@ -1,5 +1,6 @@
 function isEvolvLoaded() {
-    return window.evolv !== undefined
+    return !!window.evolv &&
+    !!window.evolv.client
 }
 
 function sendContext() {
@@ -22,9 +23,9 @@ var pollingSafetyNet = 0;
 function poll() {
     if (pollingSafetyNet++ < 50) {
         if (!isEvolvLoaded()) return setTimeout(poll, 100);
-        evolv.client.on('context.initialized', sendContext);
+        window.evolv.client.on('context.initialized', sendContext);
 
-        evolv.client.on('context.changed', sendContext);
+        window.evolv.client.on('context.changed', sendContext);
     } else {
         // set the remoteContext to `(empty)`
         sendEmptyContext();

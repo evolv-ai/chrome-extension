@@ -1,16 +1,18 @@
 let tabId;
 
 
-const refresh = () => {
-chrome.storage.sync.remove('evolv:uid');
-chrome.storage.sync.remove('evolv:envId');
-chrome.storage.sync.remove('evoTools:remoteContext');
+const reset = () => {
+    chrome.storage.sync.remove('evolv:uid');
+    chrome.storage.sync.remove('evolv:envId');
+    chrome.storage.sync.remove('evoTools:remoteContext');
+    chrome.storage.sync.remove('evolv:blockExecution');
 }
   
   
 chrome.tabs.onActivated.addListener((tab) => {
-    if (tabId) { // Clear previous tab listeners and refresh API doc
-      refresh()
+    if (tabId) {
+    // Clear previous tab store
+      reset()
     }
   
     tabId = tab.tabId;
@@ -18,6 +20,19 @@ chrome.tabs.onActivated.addListener((tab) => {
     chrome.tabs.sendMessage(tabId, {
         message: 'refresh_data'
     });
+})
+
+
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    sendResponse({
+        status: true
+    });
+
+    switch (request.message) {
+        case 'resetStore':
+            reset();
+    }
 })
 
 // chrome.runtime.onMessage.addListener(function (request) {

@@ -19,6 +19,10 @@ const run = () => {
     chrome.storage.sync.set({
         "evolv:uid": window.localStorage.getItem('evolv:uid') || '(empty)',
     });
+    chrome.storage.sync.set({
+        "evolv:blockExecution": window.sessionStorage.getItem('evolv:blockExecution') || null,
+    });
+
 
     waitForElement('script[src*="participants.evolv.ai/v1/"]').then(script => {
         let src = script.src;
@@ -65,11 +69,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             }, '*');
             break;
         case 'enable_evolv':
-            chrome.sessionStorage.removeItem('evolv:blockExecution');
+            window.sessionStorage.removeItem('evolv:blockExecution');
+            chrome.storage.sync.remove('evolv:blockExecution');
             window.location.reload();
             break;
         case 'disable_evolv':
-            chrome.sessionStorage.set({'evolv:blockExecution': true});
+            window.sessionStorage.setItem('evolv:blockExecution', 'true');
+            chrome.storage.sync.set({ "evolv:blockExecution": true });
             window.location.reload();
             break;
     }
