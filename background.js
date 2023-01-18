@@ -1,26 +1,41 @@
-// async function getCurrentTab() {
-//     let queryOptions = {
-//         active: true,
-//         currentWindow: true
-//     };
-//     let [tab] = await chrome.tabs.query(queryOptions);
-//     return tab;
-// }
-// console.log('hey brian views', views);
-// chrome.runtime.sendMessage({
-//     data: "update_popup"
-// });
-// console.log('hey brian getCurrentTab', getCurrentTab());
+let tabId;
+
+
+const reset = () => {
+    chrome.storage.sync.remove('evolv:uid');
+    chrome.storage.sync.remove('evolv:envId');
+    chrome.storage.sync.remove('evoTools:remoteContext');
+    chrome.storage.sync.remove('evolv:blockExecution');
+}
+  
+  
+chrome.tabs.onActivated.addListener((tab) => {
+    if (tabId) {
+    // Clear previous tab store
+      reset()
+    }
+  
+    tabId = tab.tabId;
+
+    chrome.tabs.sendMessage(tabId, {
+        message: 'refresh_data'
+    });
+})
 
 
 
-// chrome.webNavigation.onCompleted.addListener(function () {
-//     console.log('hey brian webNavigation completed')
-// });
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    sendResponse({
+        status: true
+    });
 
+    switch (request.message) {
+        case 'resetStore':
+            reset();
+    }
+})
 
 // chrome.runtime.onMessage.addListener(function (request) {
-//     console.log('hey brian request.message', request.message);
 //     if (request.message === 'confirmations_updated') {
 //         //   removeAllocations();
 //         //   run();
@@ -33,7 +48,6 @@
 
 
 // chrome.storage.onChanged.addListener(function (changes, namespace) {
-//     console.log('hey brian storage changed');
 //     for (let [key, {
 //             oldValue,
 //             newValue
