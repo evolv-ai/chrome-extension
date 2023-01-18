@@ -14,16 +14,6 @@ const waitForElement = async selector => {
 const run = () => {
     window.addEventListener("load", (event) => {
         injectScript()
-        window.addEventListener('message', (e) => {
-            if(typeof e.data !== 'object' || e.data.source !== 'evolvTools') {
-                return
-            }
-
-            switch (e.data.type) {
-                case 'evolv:context':
-                    chrome.storage.sync.set({ "evoTools:remoteContext": e.data.data })
-            }
-        });
     });
 
     chrome.storage.sync.set({
@@ -49,6 +39,17 @@ window.addEventListener('run_evotools_content_script', function() {
     run();
 });
 
+window.addEventListener('message', (e) => {
+    if(typeof e.data !== 'object' || e.data.source !== 'evoTools') {
+        return
+    }
+
+    switch (e.data.type) {
+        case 'evolv:context':
+            chrome.storage.sync.set({ "evoTools:remoteContext": e.data.data })
+    }
+});
+
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({
@@ -58,14 +59,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     switch (request.message) {
         case 'refresh_data':
             // the locationchange event causes the manager integration to rerun
-            window.dispatchEvent(new Event('locationchange'));
+            window.postMessage({
+                source: 'evoTools',
+                type: 'evolv:refreshContext'
+            }, '*');
             break;
         case 'enable_evolv':
-            chrome.storage.sync.remove('evolv:blockExecution');
+            chrome.sessionStorage.removeItem('evolv:blockExecution');
             window.location.reload();
             break;
         case 'disable_evolv':
-            chrome.storage.sync.set({'evolv:blockExecution': true});
+            chrome.sessionStorage.set({'evolv:blockExecution': true});
             window.location.reload();
             break;
     }

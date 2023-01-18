@@ -1,26 +1,26 @@
-// async function getCurrentTab() {
-//     let queryOptions = {
-//         active: true,
-//         currentWindow: true
-//     };
-//     let [tab] = await chrome.tabs.query(queryOptions);
-//     return tab;
-// }
-// console.log('hey brian views', views);
-// chrome.runtime.sendMessage({
-//     data: "update_popup"
-// });
-// console.log('hey brian getCurrentTab', getCurrentTab());
+let tabId;
 
 
+const refresh = () => {
+chrome.storage.sync.remove('evolv:uid');
+chrome.storage.sync.remove('evolv:envId');
+chrome.storage.sync.remove('evoTools:remoteContext');
+}
+  
+  
+chrome.tabs.onActivated.addListener((tab) => {
+    if (tabId) { // Clear previous tab listeners and refresh API doc
+      refresh()
+    }
+  
+    tabId = tab.tabId;
 
-// chrome.webNavigation.onCompleted.addListener(function () {
-//     console.log('hey brian webNavigation completed')
-// });
-
+    chrome.tabs.sendMessage(tabId, {
+        message: 'refresh_data'
+    });
+})
 
 // chrome.runtime.onMessage.addListener(function (request) {
-//     console.log('hey brian request.message', request.message);
 //     if (request.message === 'confirmations_updated') {
 //         //   removeAllocations();
 //         //   run();
@@ -33,7 +33,6 @@
 
 
 // chrome.storage.onChanged.addListener(function (changes, namespace) {
-//     console.log('hey brian storage changed');
 //     for (let [key, {
 //             oldValue,
 //             newValue

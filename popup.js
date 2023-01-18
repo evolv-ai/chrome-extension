@@ -190,25 +190,21 @@ const handleDebugButtonClicks = () => {
 
 const setBlockExecutionStatus = () => {
   waitForElement("#block-execution-toggle input").then(function (toggleInput) {
-    chrome.storage.sync.get(["evolv:blockExecution"], function (blockExecution) {
-      const blockExecutionValue = blockExecution["evolv:blockExecution"];
-      if (blockExecutionValue && typeof blockExecutionValue !== 'string') {
-        toggleInput.checked = true;
-      } else {
-        toggleInput.checked = false;
-      }
+    const blockExecutionValue = sessionStorage.getItem('evolv:blockExecution');
+    console.log('blockExecutionValue', blockExecutionValue)
+    if (typeof blockExecutionValue !== 'string') {
+      toggleInput.checked = true;
+    } else {
+      toggleInput.checked = false;
+    }
 
-      toggleInput.addEventListener('click', function (e) {
-        removeAllocations();
-        if (toggleInput.checked) {
-          sendMessageToContentJS('disable_evolv');
-        } else {
-          sendMessageToContentJS('enable_evolv');
-          setTimeout(() => {
-            run();
-          }, 3000)
-        }
-      });
+    toggleInput.addEventListener('click', function (e) {
+      removeAllocations();
+      if (toggleInput.checked) {
+        sendMessageToContentJS('disable_evolv');
+      } else {
+        sendMessageToContentJS('enable_evolv');
+      }
     });
   });
 };
@@ -223,13 +219,3 @@ let run = () => {
 }
 
 run();
-
-sendMessageToContentJS('refresh_data');
-
-
-// chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-//   console.log('hey brian message', message.data);
-//   sendResponse({
-//     status: true
-//   });
-// });

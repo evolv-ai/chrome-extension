@@ -1,28 +1,33 @@
 function isEvolvLoaded() {
-    return window.evolv !== undefined &&
-        window.evolv.context !== undefined &&
-        window.evolv.context.remoteContext !== undefined &&
-        window.evolv.context.remoteContext.experiments !== undefined &&
-        window.evolv.context.remoteContext.experiments.allocations !== undefined
+    return window.evolv !== undefined
+}
+
+function sendContext() {
+    window.postMessage({
+        source: 'evoTools',
+        type: 'evolv:context',
+        data: evolv.context.remoteContext
+    }, '*')
+}
+
+function sendEmptyContext() {
+    window.postMessage({
+        source: 'evoTools',
+        type: 'evolv:context',
+        data: ('empty')
+    }, '*')
 }
 
 var pollingSafetyNet = 0;
 function poll() {
     if (pollingSafetyNet++ < 50) {
         if (!isEvolvLoaded()) return setTimeout(poll, 100);
+        evolv.client.on('context.initialized', sendContext);
 
-        window.postMessage({
-            source: 'evolvTools',
-            type: 'evolv:context',
-            data: evolv.context.remoteContext
-        }, '*')
+        evolv.client.on('context.changed', sendContext);
     } else {
         // set the remoteContext to `(empty)`
-        window.postMessage({
-            source: 'evolvTools',
-            type: 'evolv:context',
-            data: '(empty)'
-        }, '*')
+        sendEmptyContext();
     }
 
     setTimeout(function () {
@@ -33,28 +38,17 @@ function poll() {
     }, 0);
 };
 
+window.addEventListener('message', (e) => {
+    if(typeof e.data !== 'object' || e.data.source !== 'evoTools') {
+        return
+    }
+
+    switch (e.data.type) {
+        case 'evolv:refreshContext':
+            if (isEvolvLoaded()) {
+                sendContext();
+            }
+    }
+});
+
 poll();
-
-/**	
- * Handle SPA transitions	
- */
-window.addEventListener('locationchange', function () {
-    pollingSafetyNet = 0;
-    poll();
-});
-
-history.pushState = (f => function pushState() {
-    var ret = f.apply(this, arguments);
-    window.dispatchEvent(new Event('locationchange'));
-    return ret;
-})(history.pushState);
-
-history.replaceState = (f => function replaceState() {
-    var ret = f.apply(this, arguments);
-    window.dispatchEvent(new Event('locationchange'));
-    return ret;
-})(history.replaceState);
-
-window.addEventListener('popstate', () => {
-    window.dispatchEvent(new Event('locationchange'))
-});
