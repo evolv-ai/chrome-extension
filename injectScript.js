@@ -30,13 +30,6 @@ function poll() {
         // set the remoteContext to `(empty)`
         sendEmptyContext();
     }
-
-    setTimeout(function () {
-        // tell contentScript.js that we're ready for it to run
-        // contentScript.js lives in the Evotools Chrome Extension https://github.com/briannorman/evotools
-        window.dispatchEvent(new Event('run_evotools_content_script'));
-        window.runEvotoolsContentScript = true;
-    }, 0);
 };
 
 window.addEventListener('message', (e) => {
@@ -49,6 +42,7 @@ window.addEventListener('message', (e) => {
             if (isEvolvLoaded()) {
                 sendContext();
             }
+        break
     }
 });
 

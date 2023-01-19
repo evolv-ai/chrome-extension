@@ -4,6 +4,10 @@ const injectScript = () => {
     document.body.appendChild(script);
 }
 
+window.addEventListener("load", (event) => {
+    injectScript()
+});
+
 const waitForElement = async selector => {
     while (document.querySelector(selector) === null) {
         await new Promise((resolve) => requestAnimationFrame(resolve));
@@ -11,18 +15,13 @@ const waitForElement = async selector => {
     return document.querySelector(selector);
 };
 
-const run = () => {
-    window.addEventListener("load", (event) => {
-        injectScript()
-    });
-
+const bootstrap = () => {
     chrome.storage.sync.set({
         "evolv:uid": window.localStorage.getItem('evolv:uid') || '(empty)',
     });
     chrome.storage.sync.set({
         "evolv:blockExecution": window.sessionStorage.getItem('evolv:blockExecution') || null,
     });
-
 
     waitForElement('script[src*="participants.evolv.ai/v1/"]').then(script => {
         let src = script.src;
@@ -35,13 +34,7 @@ const run = () => {
     });
 };
 
-run();
-
-// this gets fired in evotools.js - https://gist.github.com/briannorman/153fb3d7cf8b170514343063cc2e43b5
-// window event is triggered in evotools.js integration indicating that our extension is ready to rock'n'roll
-window.addEventListener('run_evotools_content_script', function() {
-    run();
-});
+bootstrap();
 
 window.addEventListener('message', (e) => {
     if(typeof e.data !== 'object' || e.data.source !== 'evoTools') {
@@ -54,7 +47,6 @@ window.addEventListener('message', (e) => {
     }
 });
 
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({
         status: true
@@ -62,7 +54,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     switch (request.message) {
         case 'refresh_data':
-            // the locationchange event causes the manager integration to rerun
             window.postMessage({
                 source: 'evoTools',
                 type: 'evolv:refreshContext'
@@ -77,6 +68,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             window.sessionStorage.setItem('evolv:blockExecution', 'true');
             chrome.storage.sync.set({ "evolv:blockExecution": true });
             window.location.reload();
+            break;
+        
+        case 'update_popup':
+            bootstrap();
             break;
     }
 });

@@ -32,6 +32,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     switch (request.message) {
         case 'resetStore':
             reset();
+            break
     }
 })
 

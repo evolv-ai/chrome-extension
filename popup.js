@@ -223,6 +223,7 @@ let run = () => {
   setAllocationsAndConfirmations();
   // handleSettingsButtonClicks();
   handleDebugButtonClicks();
+  sendMessage('update_popup');
 }
 
 run();
@@ -231,6 +232,10 @@ chrome.storage.onChanged.addListener((data, type) => {
   if(type === 'sync') {
     if (data['evoTools:remoteContext']) {
       renderExperiment(data['evoTools:remoteContext'].newValue);
+    } else if (data['evolv:uid']) {
+      setUidValue()
+    } else if (data['evolv:envId']) {
+      setEnvironmentValue()
     }
 
   }
