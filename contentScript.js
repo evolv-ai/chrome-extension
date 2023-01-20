@@ -1,3 +1,8 @@
+
+let connectionPort;
+
+const initData = {};
+
 const injectScript = () => {
     var script = document.createElement('script');
     script.src = chrome.runtime.getURL('injectScript.js');
@@ -15,26 +20,27 @@ const waitForElement = async selector => {
     return document.querySelector(selector);
 };
 
+waitForElement('script[src*="participants"]').then(script => {
+    if(!script.src.includes('.evolv.ai/v1/')) {
+        return;
+    }
+    
+    let src = script.src;
+    let v1Index = src.indexOf('v1/');
+    let envID = src.substr(v1Index + 3);
+    let slashIndex = envID.indexOf('/');
+    envID = envID.substr(0, slashIndex);
+
+    initData.envID = envID;
+    chrome.runtime.sendMessage({ message: 'evolv:envId', data: envID });
+});
+
 const bootstrap = () => {
-    chrome.storage.sync.set({
-        "evolv:uid": window.localStorage.getItem('evolv:uid') || '(empty)',
-    });
-    chrome.storage.sync.set({
-        "evolv:blockExecution": window.sessionStorage.getItem('evolv:blockExecution') || null,
-    });
+    initData.uid = window.localStorage.getItem('evolv:uid') || '(empty)';
+    initData.blockExecution = window.sessionStorage.getItem('evolv:blockExecution') || null;
 
-    waitForElement('script[src*="participants.evolv.ai/v1/"]').then(script => {
-        let src = script.src;
-        let v1Index = src.indexOf('v1/');
-        let envID = src.substr(v1Index + 3);
-        let slashIndex = envID.indexOf('/');
-        envID = envID.substr(0, slashIndex);
-
-        chrome.storage.sync.set({"evolv:envId": envID});
-    });
+    chrome.runtime.sendMessage({ message: 'evolv:initialData', data: initData });
 };
-
-bootstrap();
 
 window.addEventListener('message', (e) => {
     if(typeof e.data !== 'object' || e.data.source !== 'evoTools') {
@@ -43,7 +49,8 @@ window.addEventListener('message', (e) => {
 
     switch (e.data.type) {
         case 'evolv:context':
-            chrome.storage.sync.set({ "evoTools:remoteContext": e.data.data })
+            initData.remoteContext = e.data.data;
+            chrome.runtime.sendMessage({ message: 'evoTools:remoteContext', data: e.data.data });
     }
 });
 
@@ -53,25 +60,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
 
     switch (request.message) {
-        case 'refresh_data':
-            window.postMessage({
-                source: 'evoTools',
-                type: 'evolv:refreshContext'
-            }, '*');
-            break;
         case 'enable_evolv':
             window.sessionStorage.removeItem('evolv:blockExecution');
-            chrome.storage.sync.remove('evolv:blockExecution');
             window.location.reload();
             break;
         case 'disable_evolv':
             window.sessionStorage.setItem('evolv:blockExecution', 'true');
-            chrome.storage.sync.set({ "evolv:blockExecution": true });
             window.location.reload();
             break;
         
-        case 'update_popup':
+        case 'initialize_evoTools':
+            window.postMessage({
+                source: 'evoTools',
+                type: 'evolv:refreshContext'
+            }, '*');
             bootstrap();
             break;
     }
 });
+
+bootstrap();

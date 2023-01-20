@@ -1,23 +1,202 @@
 :root {
-  --header-height: 46px;
+  --header-height: 48px;
   --green-success: #71C97E;
   --main-font-color: #000000;
+  --border-color: #dddddd;
+  --header-z-index: 100;
 }
+
+/******* font start *******/
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fCRc4AMP6lbBP.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fABc4AMP6lbBP.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fCBc4AMP6lbBP.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fBxc4AMP6lbBP.woff2) format('woff2');
+  unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fCxc4AMP6lbBP.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fChc4AMP6lbBP.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmSU5fBBc4AMP6lQ.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu72xKKTU1Kvnz.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu5mxKKTU1Kvnz.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu7mxKKTU1Kvnz.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4WxKKTU1Kvnz.woff2) format('woff2');
+  unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu7WxKKTU1Kvnz.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu7GxKKTU1Kvnz.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxKKTU1Kg.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fCRc4AMP6lbBP.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fABc4AMP6lbBP.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fCBc4AMP6lbBP.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fBxc4AMP6lbBP.woff2) format('woff2');
+  unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fCxc4AMP6lbBP.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fChc4AMP6lbBP.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fBBc4AMP6lQ.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/****** font end ******/
 
 body {
   margin: 0;
+  font-family: Roboto, Arial, sans-serif;
+  font-weight: 300;
+}
+
+button {
+  font-family: Roboto, Arial, sans-serif;
 }
 
 .content-wrapper {
   display: flex;
   flex-direction: column;
   width: 500px;
-  overflow: hidden;
 }
 
 .row {
   flex-direction: row;
   width: 100%;
+  display: flex;
 }
 
 #header-row {
@@ -26,14 +205,27 @@ body {
   width: 100%;
   display: flex;
   color: #fff;
+  flex: 1;
+  z-index: var(--header-z-index);
+  position: sticky;
+  top: 0px;
+}
+
+.section-header.allocations-title {
+  position: sticky;
+  top: var(--header-height);
+  background: white;
+  z-index: var(--header-z-index);
 }
 
 #header-row .evolv-name {
   margin-left: -6px;
+  margin-top: 16px;
 }
 
-#header-row img {
-  height: var(--header-height);
+#header-row .logo {
+  margin: 15px 0px;
+  margin-left: 21px;
 }
 
 button.settings-icon {
@@ -65,7 +257,7 @@ button.refresh-icon {
 }
 
 #copy-debug-info {
-  margin: 5px;
+  margin: 10px;
   border: 1px solid #fff;
   border-radius: 4px;
   width: 120px;
@@ -76,7 +268,7 @@ button.refresh-icon {
   font-weight: bold;
   cursor: pointer;
   background-color: transparent;
-  height: calc(var(--header-height) - 10);
+  height: calc(var(--header-height) - 20);
 }
 
 .copy-icon {
@@ -87,7 +279,7 @@ button#copy-debug-info svg {
   position: absolute;
   transform: translateY(-50%);
   top: 50%;
-  left: 12px;
+  left: 10px;
 }
 
 button#copy-debug-info span {
@@ -113,11 +305,9 @@ h2 {
   font-size: 1em;
   padding: 10px;
   margin: 0;
-  font-family: Helvetica, Arial, sans-serif;
 }
 
 .row ul {
-  width: 100%;
   list-style: none;
   padding-left: 0;
   display: flex;
@@ -128,13 +318,17 @@ h2 {
   width: 50%;
   display: flex;
   flex-direction: row;
-  border-bottom: 1px solid #d8d8d8;
 }
 
 .section-header, .experiment-title-bar {
-  box-shadow: 0px 4px 4px -2px #000;
-  -webkit-box-shadow: 0px 4px 4px -2px #000;
+  box-shadow: 0px 4px 4px -3px #9d9d9d;
+  -webkit-box-shadow: 0px 4px 4px -3px #9d9d9d;
   border-bottom: none;
+}
+
+.section-header {
+  height: 40px;
+  line-height: 21px;
 }
 
 .experiment_row ul {
@@ -159,6 +353,20 @@ h2 {
   min-width: 70%;
   display: flex;
   align-self: center;
+}
+
+.experiment_row .experiment-title-bar li:first-child b {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  padding-right: 10px;
+}
+
+.experiment_row .e-name{
+  margin-left: 10px;
+  line-height: 18px;
 }
 
 ul li p {
@@ -195,9 +403,12 @@ ul.additional_info li p b {
 }
 
 .hide-info .experiment-title-bar {
-  border-bottom: 2px solid #333333;
   -webkit-box-shadow: none;
   box-shadow: none;
+}
+
+.experiment_row:not(:first-child) .experiment-title-bar {
+  border-top: 1px solid var(--border-color);
 }
 
 .experiment-title-bar {
@@ -220,15 +431,22 @@ ul.additional_info li p b {
 .arrow-icon svg {
   transform: rotate(180deg);
   transition: transform .3s ease;
+  position: absolute;
+  right: 20px;
+}
+
+#user-section .section-header {
+  border-top: 2px solid #323638;
 }
 
 #user-section .row ul {
   flex-direction: column;
-  margin: 0;
+  margin: 16px 10px;
 }
 
 #user-section .row ul li {
   width: 100% !important;
+  line-height: 20px;
 }
 
 #user-section .row ul li p {
@@ -249,7 +467,6 @@ ul.additional_info li p b {
   align-items: center;
   justify-content: flex-end;
   width: calc(100% - 150px);
-  font-weight: 700;
   margin-right: 10px;
 }
 #block-execution-toggle p {
@@ -260,7 +477,7 @@ ul.additional_info li p b {
   position: relative;
   display: inline-block;
   height: 14px;
-  width: 40px;
+  width: 31px;
 }
 
 /* Hide default HTML checkbox */
@@ -286,10 +503,10 @@ ul.additional_info li p b {
 .slider:before {
   position: absolute;
   content: "";
-  height: 24px;
-  width: 24px;
+  height: 21px;
+  width: 21px;
   left: 0px;
-  bottom: -5px;
+  bottom: -3px;
   background-color: #fff;
   -webkit-transition: .4s;
   transition: .4s;
@@ -309,9 +526,9 @@ input:focus+.slider {
 }
 
 input:checked+.slider:before {
-  -webkit-transform: translateX(20px);
-  -ms-transform: translateX(20px);
-  transform: translateX(20px);
+  -webkit-transform: translateX(14px);
+  -ms-transform: translateX(14px);
+  transform: translateX(14px);
 }
 
 /* Rounded sliders */
