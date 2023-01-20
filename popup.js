@@ -1,3 +1,5 @@
+let remoteContext = {};
+
 const waitForElement = async (selector) => {
   while (document.querySelector(selector) === null) {
     await new Promise((resolve) => requestAnimationFrame(resolve));
@@ -5,16 +7,13 @@ const waitForElement = async (selector) => {
   return document.querySelector(selector);
 };
 
-const sendMessage = function (message, data) {
+const sendMessage = function (message) {
   chrome.tabs.query({
     currentWindow: true,
     active: true
   }, function (tabs) {
     var activeTab = tabs[0];
-    chrome.tabs.sendMessage(activeTab.id, {
-      message,
-      data
-    });
+    chrome.tabs.sendMessage(activeTab.id, message);
   });
 };
 
@@ -36,32 +35,33 @@ const getConfirmationCIDs = (confirmations) => {
   return confirmationCIDs;
 };
 
-const setUidValue = () => {
+const setUidValue = (uid) => {
   waitForElement("#evolv_uid").then(function (uidInput) {
-    chrome.storage.sync.get(["evolv:uid"], function (resultUid) {
-      uidInput.textContent = resultUid["evolv:uid"] || '(not set)';
-    });
+    uidInput.textContent = uid || '(not set)';
   });
 };
 
-const setEnvironmentValue = () => {
+const setEnvironmentValue = (environmentValue) => {
   waitForElement("#envID").then(function (envInput) {
-    chrome.storage.sync.get(["evolv:envId"], function (resultEnvId) {
-      const environmentValue = resultEnvId["evolv:envId"]
       envInput.textContent = environmentValue || '(not set)';
-    });
   });
 };
 
 const handleExperimentRowClicks = () => {
   let experimentRows = document.querySelectorAll('.experiment-title-bar');
+
+  const clickAction = function (e) {
+    let experimentRowEl = e.target.closest('.experiment_row');
+    if (experimentRowEl) {
+      experimentRowEl.classList.contains('hide-info') ? experimentRowEl.classList.remove('hide-info') : experimentRowEl.classList.add('hide-info');
+    }
+  }
+
   Array.prototype.forEach.call(experimentRows, function (titleBar) {
-    titleBar.addEventListener('click', function (e) {
-      let experimentRowEl = e.target.closest('.experiment_row');
-      if (experimentRowEl) {
-        experimentRowEl.classList.contains('hide-info') ? experimentRowEl.classList.remove('hide-info') : experimentRowEl.classList.add('hide-info');
-      }
-    });
+    if(!titleBar.classList.contains('visited')) {
+      titleBar.classList.add('visited');
+      titleBar.addEventListener('click', clickAction);
+    }
   });
 };
 
@@ -91,7 +91,7 @@ const handleSettingsButtonClicks = () => {
 //   }
 // };
 
-const renderExperiment = (remoteContext) => {
+const setAllocationsAndConfirmations = () => {
   if (remoteContext && remoteContext.experiments && remoteContext.experiments.allocations) {
     // setQaAudience(remoteContext);
 
@@ -137,6 +137,7 @@ const renderExperiment = (remoteContext) => {
                   <ul class="additional_info">
                   
                     <li><p><b>UID:</b> <span class="conf_uid">${allocation.uid}</span></p></li>
+                    <li><p><b>UID:</b> <span class="conf_uid">${allocation.eid}</span></p></li>
                     <li><p><b>CID:</b> <span class="conf_cid">${allocation.cid}</span></p></li>
                     <li><p><b>Group ID:</b> <span class="conf_group_id">${allocation.group_id}</span></p></li>
                     <li><p><b>Excluded:</b> <span class="conf_excluded">${allocation.excluded}</span></p></li>
@@ -161,18 +162,12 @@ const renderExperiment = (remoteContext) => {
       }
     }
   }
-}
-
-const setAllocationsAndConfirmations = () => {
-  chrome.storage.sync.get(["evoTools:remoteContext"], function (rc) {
-    remoteContext = rc["evoTools:remoteContext"];
-    renderExperiment(remoteContext);
-  });
 };
 
-const handleDebugButtonClicks = () => {
-  waitForElement('#copy-debug-info').then(function (debugButton) {
-    debugButton.addEventListener('click', function () {
+const handleCopyButtonClicks = () => {
+  waitForElement('#copy-debug-info').then(function (copyButton) {
+    copyButton.addEventListener('click', function () {
+      const currentInnerHTML = copyButton.innerHTML;
       // add remoteContext string to the clipboard
       var data = [new ClipboardItem({
         "text/plain": new Blob([JSON.stringify(remoteContext)], {
@@ -181,62 +176,65 @@ const handleDebugButtonClicks = () => {
       })];
       navigator.clipboard.write(data);
 
-      debugButton.classList.add('copied');
-      debugButton.textContent = "Copied!";
+      copyButton.classList.add('copied');
+      copyButton.textContent = "Copied!";
 
       setTimeout(function () {
-        debugButton.classList.remove('copied');
-        debugButton.textContent = "Copy Debug Info";
+        copyButton.classList.remove('copied');
+        copyButton.innerHTML = currentInnerHTML;
       }, 1500);
     });
   });
 };
 
-const setBlockExecutionStatus = () => {
+const setBlockExecutionStatus = (blockExecutionValue) => {
   waitForElement("#block-execution-toggle input").then(function (toggleInput) {
-    chrome.storage.sync.get('evolv:blockExecution', (res) => {
-      const blockExecutionValue = res['evolv:blockExecution'];
-      if (blockExecutionValue) {
-        toggleInput.checked = false;
-      } else {
-        toggleInput.checked = true;
-      }
+    if (blockExecutionValue) {
+      toggleInput.checked = false;
+    } else {
+      toggleInput.checked = true;
+    }
 
-      toggleInput.addEventListener('click', function (e) {
-        removeAllocations();
-        if (!toggleInput.checked) {
-          sendMessage('disable_evolv');
-          chrome.runtime.sendMessage({ message: 'resetStore' });
-        } else {
-          sendMessage('enable_evolv');
-          setTimeout(() => { window.location.reload();}, 300);
-        }
-      });
+    toggleInput.addEventListener('click', function (e) {
+      removeAllocations();
+      if (!toggleInput.checked) {
+        sendMessage({ message: 'disable_evolv' });
+        e.target.parentElement.previousElementSibling.textContent = 'Snippet Disabled';
+      } else {
+        sendMessage({ message: 'enable_evolv' });
+        e.target.parentElement.previousElementSibling.textContent = 'Snippet Enabled';
+      }
     });
   });
 };
 
 let run = () => {
-  setBlockExecutionStatus();
-  setUidValue();
-  setEnvironmentValue();
-  setAllocationsAndConfirmations();
   // handleSettingsButtonClicks();
-  handleDebugButtonClicks();
-  sendMessage('update_popup');
+  handleCopyButtonClicks();
+  sendMessage({ message: 'initialize_evoTools' });
 }
 
-run();
-
-chrome.storage.onChanged.addListener((data, type) => {
-  if(type === 'sync') {
-    if (data['evoTools:remoteContext']) {
-      renderExperiment(data['evoTools:remoteContext'].newValue);
-    } else if (data['evolv:uid']) {
-      setUidValue()
-    } else if (data['evolv:envId']) {
-      setEnvironmentValue()
-    }
+chrome.runtime.onMessage.addListener((msg) => {
+  switch (msg.message) {
+    case 'evoTools:remoteContext':
+      remoteContext = msg.data;
+      setAllocationsAndConfirmations();
+      break;
+    case 'evolv:blockExecution':
+      setBlockExecutionStatus(msg.data);
+      break;
+    case 'evolv:envId':
+      setEnvironmentValue(msg.data);
+      break;
+    case 'evolv:initialData':
+      remoteContext = msg.data.remoteContext;
+      setAllocationsAndConfirmations();
+      setBlockExecutionStatus(msg.data.blockExecution);
+      setEnvironmentValue(msg.data.envID);
+      setUidValue(msg.data.uid)
 
   }
-})
+});
+
+
+run();
