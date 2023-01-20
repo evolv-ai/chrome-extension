@@ -345,6 +345,20 @@ h2 {
   align-self: center;
 }
 
+.experiment_row .experiment-title-bar li:first-child b {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  padding-right: 10px;
+}
+
+.experiment_row .e-name{
+  margin-left: 10px;
+  line-height: 18px;
+}
+
 ul li p {
   display: flex;
   flex-direction: row;

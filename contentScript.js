@@ -20,7 +20,11 @@ const waitForElement = async selector => {
     return document.querySelector(selector);
 };
 
-waitForElement('script[src*="participants.evolv.ai/v1/"]').then(script => {
+waitForElement('script[src*="participants"]').then(script => {
+    if(!script.src.includes('.evolv.ai/v1/')) {
+        return;
+    }
+    
     let src = script.src;
     let v1Index = src.indexOf('v1/');
     let envID = src.substr(v1Index + 3);

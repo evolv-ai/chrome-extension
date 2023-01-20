@@ -3,11 +3,38 @@ function isEvolvLoaded() {
     !!window.evolv.client
 }
 
-function sendContext() {
+function experimentsNameAssigner () {
+    const experimentNames = {}
+
+    return async () => {
+        if (!evolv.context.remoteContext.experiments && !evolv.context.remoteContext.experiments.allocations) {
+            return;
+        }
+        const allocations = evolv.context.remoteContext.experiments.allocations;
+        const allocationsLength = allocations.length;
+        for (let i = 0; i < allocationsLength; i++) {
+            const eid = allocations[i].eid;
+            if(!experimentNames[eid]) {
+                experimentNames[eid] = await evolv.client.getDisplayName('experiments', eid);
+            }
+        }
+
+        return experimentNames;
+    }
+}
+
+const addENameToContext = experimentsNameAssigner();
+
+async function sendContext() {
+    const experimentNames = await addENameToContext();
+
     window.postMessage({
         source: 'evoTools',
         type: 'evolv:context',
-        data: evolv.context.remoteContext
+        data: {
+            ...evolv.context.remoteContext,
+            experimentNames
+        }
     }, '*')
 }
 
