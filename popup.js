@@ -137,7 +137,7 @@ const setAllocationsAndConfirmations = () => {
                       }
                       <b class="e-name">${experimentNames[allocation.eid]}</b></li>
                     <li>
-                      <p><b>Combination:</b> <span class="ordinal">${allocation.ordinal}</span></p>
+                      <p><span>Combination:</span> <span class="ordinal">${allocation.ordinal}</span></p>
                       <div class="arrow-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="9" viewBox="0 0 12 9" fill="none">
                           <path d="M10.6 0.624994L12 2.02499L6 8.02499L5.24537e-07 2.02499L1.4 0.624993L6 5.22499L10.6 0.624994Z" fill="#666666"/>
@@ -147,11 +147,12 @@ const setAllocationsAndConfirmations = () => {
                   </ul>
                   <ul class="additional_info">
                   
-                    <li><p><b>UID:</b> <span class="conf_uid">${allocation.uid}</span></p></li>
-                    <li><p><b>UID:</b> <span class="conf_uid">${allocation.eid}</span></p></li>
-                    <li><p><b>CID:</b> <span class="conf_cid">${allocation.cid}</span></p></li>
-                    <li><p><b>Group ID:</b> <span class="conf_group_id">${allocation.group_id}</span></p></li>
-                    <li><p><b>Excluded:</b> <span class="conf_excluded">${allocation.excluded}</span></p></li>
+                    <li><p><b>uid:</b> <span class="conf_uid">${allocation.uid}</span></p></li>
+                    <li><p><b>eid:</b> <span class="conf_eid">${allocation.eid}</span></p></li>
+                    <li><p><b>cid:</b> <span class="conf_cid">${allocation.cid}</span></p></li>
+                    <li><p><b>group_id:</b> <span class="conf_group_id">${allocation.group_id}</span></p></li>
+                    <li><p><b>excluded:</b> <span class="conf_excluded">${allocation.excluded}</span></p></li>
+                    <li><p><b>ordinal:</b> <span class="conf_excluded">${allocation.ordinal}</span></p></li>
                   </ul>
                 </div>
               `

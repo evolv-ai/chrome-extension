@@ -1,8 +1,9 @@
 :root {
-  --header-height: 46px;
+  --header-height: 48px;
   --green-success: #71C97E;
   --main-font-color: #000000;
   --border-color: #dddddd;
+  --header-z-index: 100;
 }
 
 /******* font start *******/
@@ -190,7 +191,6 @@ button {
   display: flex;
   flex-direction: column;
   width: 500px;
-  overflow: hidden;
 }
 
 .row {
@@ -206,6 +206,16 @@ button {
   display: flex;
   color: #fff;
   flex: 1;
+  z-index: var(--header-z-index);
+  position: sticky;
+  top: 0px;
+}
+
+.section-header.allocations-title {
+  position: sticky;
+  top: var(--header-height);
+  background: white;
+  z-index: var(--header-z-index);
 }
 
 #header-row .evolv-name {
@@ -421,6 +431,8 @@ ul.additional_info li p b {
 .arrow-icon svg {
   transform: rotate(180deg);
   transition: transform .3s ease;
+  position: absolute;
+  right: 20px;
 }
 
 #user-section .section-header {
