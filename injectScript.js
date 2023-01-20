@@ -7,10 +7,11 @@ function experimentsNameAssigner () {
     const experimentNames = {}
 
     return async () => {
-        if (!evolv.context.remoteContext.experiments && !evolv.context.remoteContext.experiments.allocations) {
+        const experiments = evolv.context.get('experiments')
+        if (!experiments && !experiments.allocations) {
             return;
         }
-        const allocations = evolv.context.remoteContext.experiments.allocations;
+        const allocations = experiments.allocations;
         const allocationsLength = allocations.length;
         for (let i = 0; i < allocationsLength; i++) {
             const eid = allocations[i].eid;
