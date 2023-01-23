@@ -20,16 +20,8 @@ const waitForElement = async selector => {
     return document.querySelector(selector);
 };
 
-waitForElement('script[src*="participants"]').then(script => {
-    if(!script.src.includes('.evolv.ai/v1/')) {
-        return;
-    }
-    
-    let src = script.src;
-    let v1Index = src.indexOf('v1/');
-    let envID = src.substr(v1Index + 3);
-    let slashIndex = envID.indexOf('/');
-    envID = envID.substr(0, slashIndex);
+waitForElement('script[src*="evolv.ai/asset-manager"]').then(script => {
+    const envID = script.dataset.evolvEnvironment;
 
     initData.envID = envID;
     chrome.runtime.sendMessage({ message: 'evolv:envId', data: envID });

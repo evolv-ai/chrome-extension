@@ -8,7 +8,7 @@ function experimentsNameAssigner () {
 
     return async () => {
         const experiments = evolv.context.get('experiments')
-        if (!experiments && !experiments.allocations) {
+        if (!experiments || !experiments.allocations) {
             return;
         }
         const allocations = experiments.allocations;
