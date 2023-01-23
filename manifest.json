@@ -6,16 +6,7 @@
   "host_permissions": [
     "<all_urls>"
   ],
-  "permissions": [
-    "storage",
-    "activeTab",
-    "scripting",
-    "webRequest",
-    "cookies", 
-    "system.storage", 
-    "system.memory",
-    "webNavigation"
-  ],
+  "permissions": [],
   "content_scripts": [
     {
       "matches": [
@@ -33,9 +24,6 @@
     "resources": ["injectScript.js"],
     "matches": ["<all_urls>"]
   }],
-  "background": {
-    "service_worker": "/background.js"
-  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -50,6 +38,5 @@
     "32": "/images/evolv-logo-orange.png",
     "48": "/images/evolv-logo-orange.png",
     "128": "/images/evolv-logo-orange.png"
-  },
-  "options_page": "settings.html"
+  }
 }

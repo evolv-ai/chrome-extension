@@ -55,7 +55,6 @@ function poll() {
 
         window.evolv.client.on('context.changed', sendContext);
     } else {
-        // set the remoteContext to `(empty)`
         sendEmptyContext();
     }
 };
