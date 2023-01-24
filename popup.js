@@ -66,7 +66,6 @@ const handleExperimentRowClicks = () => {
 };
 
 const handleSettingsButtonClicks = () => {
-  // Listen for clicks to the Options button
   waitForElement("button.settings-icon").then(function (settingsButton) {
     settingsButton.addEventListener("click", function () {
       chrome.tabs.create({
@@ -76,25 +75,8 @@ const handleSettingsButtonClicks = () => {
   });
 };
 
-
-//
-// FYI - this doesn't currently get set in the remoteContext as you might expect 
-//
-// const setQaAudienceEnabled = (qaAudienceEnabled) => {
-//   let qaInput = document.querySelector('#evolv_qaAudienceEnabled');
-//   qaInput.textContent = qaAudienceEnabled;
-// };
-// const setQaAudience = remoteContext => {\
-//   if (remoteContext.config) {
-//     let qaAudienceEnabled = remoteContext.config.qaAudienceEnabled;
-//     setQaAudienceEnabled(!!qaAudienceEnabled);
-//   }
-// };
-
 const setAllocationsAndConfirmations = () => {
   if (remoteContext && remoteContext.experiments && remoteContext.experiments.allocations) {
-    // setQaAudience(remoteContext);
-
     const allocations = remoteContext.experiments.allocations;
     const confirmations = remoteContext.experiments.confirmations;
     const experimentNames = remoteContext.experimentNames;
@@ -107,19 +89,7 @@ const setAllocationsAndConfirmations = () => {
     if (allocations.length > 0) {
       for (let i = 0; i < allocations.length; i++) {
         const allocation = allocations[i];
-        // TODO figure out a way to get these values
-        // const organizationId = 'ca93a6b80d';
-        // const projectId = '92d0fe50ce';
-        // const experimentName = 'Opt 11 Prospect Gridwall';
-
-        // const managerExperimentURL = `https://app.evolv.ai/organizations/${organizationId}/deploy/${environmentId}/projects/${projectId}`;
-        // const managerCombinationURL = `https://app.evolv.ai/${organizationId}/deploy/${environmentId}/projects/${projectId}/combinations/${allocation.cid}/view`;
-        // <!-- <li><p><a href="${managerExperimentURL}" target="_blank"><b>View Experiment in Evolv Manager</b></a></p></li> -->
-        // <!-- <li><p><a href="${managerCombinationURL}" target="_blank"><b>View Combination in Evolv Manager</b></a></p></li> -->
-
-
         waitForElement("#experiment-section").then(function (experimentList) {
-          // check to make sure the experiment row doesn't already exist
           if (!document.querySelector(`.experiment_row[data-allocation="${allocation.cid}"]`)) {
             experimentList.insertAdjacentHTML(
               "beforeend", `
@@ -221,7 +191,6 @@ const setBlockExecutionStatus = (blockExecutionValue) => {
 };
 
 let run = () => {
-  // handleSettingsButtonClicks();
   handleCopyButtonClicks();
   sendMessage({ message: 'initialize_evoTools' });
 }

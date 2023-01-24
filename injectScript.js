@@ -8,7 +8,7 @@ function experimentsNameAssigner () {
 
     return async () => {
         const experiments = evolv.context.get('experiments')
-        if (!experiments && !experiments.allocations) {
+        if (!experiments || !experiments.allocations) {
             return;
         }
         const allocations = experiments.allocations;
@@ -55,7 +55,6 @@ function poll() {
 
         window.evolv.client.on('context.changed', sendContext);
     } else {
-        // set the remoteContext to `(empty)`
         sendEmptyContext();
     }
 };
