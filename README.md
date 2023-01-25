@@ -1,7 +1,8 @@
-# EvoTools (beta)
+# EvoTools
 
 
-## Getting Started
+## Start Development:
+
 ---
 #### **1)** In this Github project, click the green `Code` button and choose `Download ZIP`.  Save the zip file somewhere that you're not going to delete it by accident.  Once downloaded, open the zip file and you should see a directory named `evotools-main`.
 <img src="https://imgur.com/8hvUBj4.png"/>
@@ -24,34 +25,18 @@
 
 ---
 
-#### **5)** We use `injectScript.js` to get the evolv remotecontext and send it to `evolvTool`. We actually have a bridge between webpage and `contentScript` to transfer data. We also can transfer data between `contentScript` and background as internal communication to make a complete data flow.
-
----
-
-#### **6)** Name the integration `EvoTools` and click the `Add New Connector` button at the bottom of the page.
-<img src="https://imgur.com/kBi2A9p.png"/>
-
----
-
-#### **7)** In the Connector Source dropdown, choose the `Gist` option.  In the `Gist` input, enter `153fb3d7cf8b170514343063cc2e43b5`.  Click the `Create` button in the top right corner.  If you don't see your integration appear in the list of integrations, refresh the page.
-<img src="https://imgur.com/p8lrM1H.png"/>
-
----
-
-#### **8)** Navigate to the `Environments` tab and click on the environment that you'd like to add the integration to.  When the side-drawer opens, click the `Integrations` tab followed by the `Add Integration` dropdown.  Choose `EvoTools` and then click `Save` in the top right corner.
-<img src="https://imgur.com/9n2qKcL.png"/>
-
----
-
-#### **9)** You're all set up!  Navigate to a page that you know has an active experiment, click the extension icon, and validate that you are seeing data.
+#### **5)** You're all set up!  Navigate to a page that you know has an active experiment, click the extension icon, and validate that you are seeing data.
 <img src="https://imgur.com/AHn9ubo.png"/>
 
-
----
 ---
 
+### Dev Notes: ##
 
-This extension is still in the very early stages and hasn't been widely used so please report any issues or feature requests to brian.norman@evolv.ai.
+We use `injectScript.js` to get the evolv remotecontext and send it to `evolvTool`. We actually have a bridge between webpage and `contentScript` to transfer data. We also can transfer data between `contentScript` and background as internal communication to make a complete data flow.
+
+---
+
+This extension is still in the very early stages and hasn't been widely used so please create an issue when you find one.
 
 ---
 
