@@ -1,11 +1,14 @@
-
-let connectionPort;
-
 const initData = {};
+let isPopupOpen = false
 
 const injectScript = () => {
+    if (document.getElementById('evolvTools:injectedScript')) {
+        return;
+    }
+
     var script = document.createElement('script');
     script.src = chrome.runtime.getURL('injectScript.js');
+    script.id = 'evolvTools:injectedScript';
     document.body.appendChild(script);
 }
 
@@ -24,7 +27,9 @@ waitForElement('script[src*="evolv.ai/asset-manager"]').then(script => {
     const envID = script.dataset.evolvEnvironment;
 
     initData.envID = envID;
-    chrome.runtime.sendMessage({ message: 'evolv:envId', data: envID });
+    if (isPopupOpen){
+        chrome.runtime.sendMessage({ message: 'evolv:envId', data: envID });
+    }
 });
 
 const bootstrap = () => {
@@ -42,7 +47,9 @@ window.addEventListener('message', (e) => {
     switch (e.data.type) {
         case 'evolv:context':
             initData.remoteContext = e.data.data;
-            chrome.runtime.sendMessage({ message: 'evoTools:remoteContext', data: e.data.data });
+            if (isPopupOpen){
+                chrome.runtime.sendMessage({ message: 'evoTools:remoteContext', data: e.data.data });
+            }
     }
 });
 
@@ -68,7 +75,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             }, '*');
             bootstrap();
             break;
+        case 'evolv_popup_closed':
+            isPopupOpen= false;
+            break;
+        case 'ping_content_script':
+            isPopupOpen = true;
+            break;
     }
 });
-
-bootstrap();
