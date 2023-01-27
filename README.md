@@ -33,10 +33,6 @@ We use `injectScript.js` to get the evolv remotecontext and send it to `evolvToo
 
 ---
 
-This extension is still in the very early stages and hasn't been widely used so please submit an issue when you got one.
-
----
-
 ## Future Ideas 
 * Log events as they are triggered.
 * Link each combinations to the experiment in the manager
