@@ -1,4 +1,5 @@
 let remoteContext = {};
+let contentJsLoaded = true;
 
 const waitForElement = async (selector) => {
   while (document.querySelector(selector) === null) {
@@ -90,7 +91,7 @@ const setAllocationsAndConfirmations = () => {
       for (let i = 0; i < allocations.length; i++) {
         const allocation = allocations[i];
         waitForElement("#experiment-section").then(function (experimentList) {
-          if (!document.querySelector(`.experiment_row[data-allocation="${allocation.cid}"]`)) {
+          if (!document.querySelector(`.experiment_row[data-allocation="${allocation.cid}"]`) && !!experimentList) {
             experimentList.insertAdjacentHTML(
               "beforeend", `
                 <div class="experiment_row hide-info" data-allocation="${allocation.cid}">
@@ -139,9 +140,11 @@ const setAllocationsAndConfirmations = () => {
       handleExperimentRowClicks();
     } else {
       const noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
-      if (experimentList && !noAllocationsEl) {
-        experimentList.insertAdjacentHTML("beforeend", `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No allocations</p></div>`);
-      }
+      waitForElement("#experiment-section").then(function (experimentList) {
+        if (!!experimentList && !noAllocationsEl) {
+          experimentList.insertAdjacentHTML("beforeend", `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No allocations</p></div>`);
+        }
+      });
     }
   }
 };
@@ -195,6 +198,11 @@ let run = () => {
   sendMessage({ message: 'initialize_evoTools' });
 }
 
+setInterval(() => {
+  // let contentjs know popup is open. it prevents sending message to popup when it's closed.
+  sendMessage({ message: 'ping_content_script' });
+}, 1000)
+
 chrome.runtime.onMessage.addListener((msg) => {
   switch (msg.message) {
     case 'evoTools:remoteContext':
@@ -213,9 +221,7 @@ chrome.runtime.onMessage.addListener((msg) => {
       setBlockExecutionStatus(msg.data.blockExecution);
       setEnvironmentValue(msg.data.envID);
       setUidValue(msg.data.uid)
-
   }
 });
-
 
 run();
