@@ -91,6 +91,7 @@ const setAllocationsAndConfirmations = () => {
       for (let i = 0; i < allocations.length; i++) {
         const allocation = allocations[i];
         waitForElement("#experiment-section").then(function (experimentList) {
+          const expName = experimentNames[allocation.eid] ? experimentNames[allocation.eid] : allocation.eid
           if (!document.querySelector(`.experiment_row[data-allocation="${allocation.cid}"]`) && !!experimentList) {
             experimentList.insertAdjacentHTML(
               "beforeend", `
@@ -106,7 +107,7 @@ const setAllocationsAndConfirmations = () => {
                         <path d="M9 17.3333C7.84722 17.3333 6.76389 17.1144 5.75 16.6767C4.73611 16.2394 3.85416 15.6458 3.10416 14.8958C2.35416 14.1458 1.76055 13.2639 1.32333 12.25C0.885553 11.2361 0.666664 10.1528 0.666664 9C0.666664 7.84722 0.885553 6.76389 1.32333 5.75C1.76055 4.73611 2.35416 3.85416 3.10416 3.10416C3.85416 2.35416 4.73611 1.76028 5.75 1.3225C6.76389 0.885275 7.84722 0.666664 9 0.666664C10.1528 0.666664 11.2361 0.885275 12.25 1.3225C13.2639 1.76028 14.1458 2.35416 14.8958 3.10416C15.6458 3.85416 16.2394 4.73611 16.6767 5.75C17.1144 6.76389 17.3333 7.84722 17.3333 9C17.3333 10.1528 17.1144 11.2361 16.6767 12.25C16.2394 13.2639 15.6458 14.1458 14.8958 14.8958C14.1458 15.6458 13.2639 16.2394 12.25 16.6767C11.2361 17.1144 10.1528 17.3333 9 17.3333ZM9 15.6667C10.8611 15.6667 12.4375 15.0208 13.7292 13.7292C15.0208 12.4375 15.6667 10.8611 15.6667 9C15.6667 8.25 15.545 7.52777 15.3017 6.83333C15.0589 6.13889 14.7083 5.5 14.25 4.91666L4.91666 14.25C5.5 14.7083 6.13889 15.0589 6.83333 15.3017C7.52777 15.545 8.25 15.6667 9 15.6667ZM3.75 13.0833L13.0833 3.75C12.5 3.29166 11.8611 2.94111 11.1667 2.69833C10.4722 2.455 9.75 2.33333 9 2.33333C7.13889 2.33333 5.5625 2.97916 4.27083 4.27083C2.97916 5.5625 2.33333 7.13889 2.33333 9C2.33333 9.75 2.455 10.4722 2.69833 11.1667C2.94111 11.8611 3.29166 12.5 3.75 13.0833Z" fill="#DD0000"/>
                         </svg>`
                       }
-                      <b class="e-name">${experimentNames[allocation.eid]}</b></li>
+                      <b class="e-name">${expName}</b></li>
                     <li>
                       <p><span>Combination:</span> <span class="ordinal">${allocation.ordinal}</span></p>
                       <div class="arrow-icon">
