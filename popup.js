@@ -49,20 +49,23 @@ const setEnvironmentValue = (environmentValue) => {
 };
 
 const handleExperimentRowClicks = () => {
-  let experimentRows = document.querySelectorAll('.experiment-title-bar');
+  waitForElement('.experiment-title-bar').then(function () {
+    let experimentRows = document.querySelectorAll('.experiment-title-bar');
 
-  const clickAction = function (e) {
-    let experimentRowEl = e.target.closest('.experiment_row');
-    if (experimentRowEl) {
-      experimentRowEl.classList.contains('hide-info') ? experimentRowEl.classList.remove('hide-info') : experimentRowEl.classList.add('hide-info');
+    const clickAction = function (e) {
+      let experimentRowEl = e.target.closest('.experiment_row');
+      if (experimentRowEl) {
+        experimentRowEl.classList.contains('hide-info') ? experimentRowEl.classList.remove('hide-info') : experimentRowEl.classList.add('hide-info');
+      }
     }
-  }
 
-  Array.prototype.forEach.call(experimentRows, function (titleBar) {
-    if(!titleBar.classList.contains('visited')) {
-      titleBar.classList.add('visited');
-      titleBar.addEventListener('click', clickAction);
-    }
+    Array.prototype.forEach.call(experimentRows, function (titleBar) {
+      if(!titleBar.classList.contains('visited')) {
+
+        titleBar.classList.add('visited');
+        titleBar.addEventListener('click', clickAction);
+      }
+    });
   });
 };
 
