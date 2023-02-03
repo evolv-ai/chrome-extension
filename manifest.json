@@ -1,6 +1,6 @@
 {
-  "name": "EvoTools",
-  "description": "Display data from Evolv AI",
+  "name": "EvolvAI",
+  "description": "Display information about Evolv AI optimizations",
   "version": "1.0",
   "manifest_version": 3,
   "host_permissions": [
