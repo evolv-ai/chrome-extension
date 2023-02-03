@@ -104,7 +104,7 @@ const setAllocationsAndConfirmations = () => {
                       <b class="e-name">${expName}</b>
                     </li>
                     <li class="combination">
-                      <p><span>Combination:</span> <span class="ordinal">${allocation.ordinal || '-'}</span></p>
+                      <p><span>Combination:</span> <span class="ordinal">${allocation.ordinal === undefined ? '-' : allocation.ordinal}</span></p>
                     </li>
                     <li>
                       <div class="tooltip">
@@ -140,7 +140,7 @@ const setAllocationsAndConfirmations = () => {
                     <li><p><b>cid:</b> <span class="conf_cid">${allocation.cid}</span></p></li>
                     <li><p><b>group_id:</b> <span class="conf_group_id">${allocation.group_id || '-'}</span></p></li>
                     <li><p><b>excluded:</b> <span class="conf_excluded">${allocation.excluded}</span></p></li>
-                    <li><p><b>ordinal:</b> <span class="conf_excluded">${allocation.ordinal || '-'}</span></p></li>
+                    <li><p><b>ordinal:</b> <span class="conf_excluded">${allocation.ordinal === undefined ? '-' : allocation.ordinal}</span></p></li>
                   </ul>
                 </div>
               `
