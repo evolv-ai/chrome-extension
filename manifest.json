@@ -6,7 +6,7 @@
   "host_permissions": [
 
   ],
-  "permissions": ["activeTab"],
+  "permissions": [],
   "content_scripts": [
     {
       "matches": [
