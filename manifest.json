@@ -1,10 +1,10 @@
 {
-  "name": "EvoTools",
-  "description": "Display data from Evolv AI",
+  "name": "Evolv AI",
+  "description": "Display information about Evolv AI optimizations",
   "version": "1.0",
   "manifest_version": 3,
   "host_permissions": [
-    "<all_urls>"
+
   ],
   "permissions": [],
   "content_scripts": [
@@ -27,16 +27,16 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "/images/evolv-logo-orange.png",
-      "32": "/images/evolv-logo-orange.png",
-      "48": "/images/evolv-logo-orange.png",
-      "128": "/images/evolv-logo-orange.png"
+      "16": "/images/evolv-logo-orange-16.png",
+      "32": "/images/evolv-logo-orange-32.png",
+      "48": "/images/evolv-logo-orange-48.png",
+      "128": "/images/evolv-logo-orange-128.png"
     }
   },
   "icons": {
-    "16": "/images/evolv-logo-orange.png",
-    "32": "/images/evolv-logo-orange.png",
-    "48": "/images/evolv-logo-orange.png",
-    "128": "/images/evolv-logo-orange.png"
+    "16": "/images/evolv-logo-orange-16.png",
+    "32": "/images/evolv-logo-orange-32.png",
+    "48": "/images/evolv-logo-orange-48.png",
+    "128": "/images/evolv-logo-orange-128.png"
   }
 }
