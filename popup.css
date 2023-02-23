@@ -352,11 +352,10 @@ h2 {
 .experiment_row ul:first-of-type li {
   display: flex;
   align-self: center;
-  flex: 1;
 }
 
 .experiment_row ul:first-of-type li:first-child {
-  flex: 4;
+  width: 60%;
 }
 
 .experiment_row ul:first-of-type li.combination {
