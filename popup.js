@@ -210,28 +210,31 @@ const setBlockExecutionStatus = (blockExecutionValue) => {
   });
 };
 
-function getTimeSinceEvent(eventTimestamp) {
-  const currentTimestamp = Date.now();
-  const timeDifference = currentTimestamp - eventTimestamp;
+const timeFormatter = new Intl.RelativeTimeFormat(undefined, {
+  numeric: "always",
+  style: "narrow"
+})
 
-  const seconds = Math.floor(timeDifference / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
+const DIVISIONS = [
+  { amount: 60, name: "seconds" },
+  { amount: 60, name: "minutes" },
+  { amount: 24, name: "hours" }
+]
 
-  let timeSince = '';
+function formatTimeAgo(timestamp) {
+  let duration = (timestamp - Date.now()) / 1000;
 
-  if (seconds < 60) {
-    timeSince = `${seconds}s`;
-  } else if (minutes < 60) {
-    timeSince = `${minutes}m`;
-  } else if (hours < 24) {
-    timeSince = `${hours}h`;
-  } else {
-    timeSince = `${days}d`;
+  for (let i = 0; i < DIVISIONS.length; i++) {
+    const division = DIVISIONS[i]
+
+    if (Math.abs(duration) < division.amount) {
+      return timeFormatter.format(Math.round(duration), division.name)
+    }
+
+    duration /= division.amount
   }
 
-  return `(${timeSince})`;
+  return '';
 }
 
 const setEvents = () => {
@@ -247,7 +250,7 @@ const setEvents = () => {
           console.log(event.name);
           const eventTime = new Date(event.timestamp).toLocaleTimeString();
           const eventUniqueKey = `${eventName}.${event.timestamp}`;
-          const timeSince = getTimeSinceEvent(event.timestamp);
+          const timeSince = formatTimeAgo(event.timestamp);
 
           if (!document.querySelector(`event-row[data-event-key="${eventUniqueKey}"]`) && !!eventsList) {
             eventsList.insertAdjacentHTML(
@@ -256,7 +259,7 @@ const setEvents = () => {
                     <div class="event-name">${eventName}</div>
                     <div class="timestamp-container">
                       <div class="event-timestamp">${eventTime}</div>
-                      <div class="time-since">${timeSince}</div>
+                      <div class="time-since">(${timeSince})</div>
                     </div>
                 </div>
               `
