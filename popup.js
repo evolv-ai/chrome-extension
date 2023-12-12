@@ -121,7 +121,7 @@ const setAllocationsAndConfirmations = () => {
                         <div class="tooltip-message">
                           ${
                             confirmationCIDs.includes(allocation.cid)
-                            ? 'This page is the entry point of this project'
+                            ? 'This page is an entry point of this project'
                             : 'This page is not an entry point for this project'
                           }
                         </div>
@@ -210,6 +210,81 @@ const setBlockExecutionStatus = (blockExecutionValue) => {
   });
 };
 
+const timeFormatter = new Intl.RelativeTimeFormat(undefined, {
+  numeric: "always",
+  style: "narrow"
+})
+
+const DIVISIONS = [
+  { amount: 60, name: "seconds" },
+  { amount: 60, name: "minutes" },
+  { amount: 24, name: "hours" }
+]
+
+function formatTimeAgo(timestamp) {
+  let duration = (timestamp - Date.now()) / 1000;
+
+  for (let i = 0; i < DIVISIONS.length; i++) {
+    const division = DIVISIONS[i]
+
+    if (Math.abs(duration) < division.amount) {
+      return timeFormatter.format(Math.round(duration), division.name)
+    }
+
+    duration /= division.amount
+  }
+
+  return '';
+}
+
+const setEvents = () => {
+  if (remoteContext) {
+    const events = remoteContext.events;
+
+    if (events && events.length) {
+      for (let i = events.length; i >= 0; i--) {
+        const event = events[i];
+
+        waitForElement("#events-section").then(function (eventsList) {
+          const eventName = event.type;
+          console.log(event.name);
+          const eventTime = new Date(event.timestamp).toLocaleTimeString();
+          const eventUniqueKey = `${eventName}.${event.timestamp}`;
+          const timeSince = formatTimeAgo(event.timestamp);
+
+          if (!document.querySelector(`event-row[data-event-key="${eventUniqueKey}"]`) && !!eventsList) {
+            eventsList.insertAdjacentHTML(
+              "beforeend", `
+                <div class="event-row" data-event-key="${eventUniqueKey}">
+                    <div class="event-name">${eventName}</div>
+                    <div class="timestamp-container">
+                      <div class="event-timestamp">${eventTime}</div>
+                      <div class="time-since">(${timeSince})</div>
+                    </div>
+                </div>
+              `
+            );
+          }
+        });
+      }
+
+      const noEventsEl = document.querySelector('.event-row[data-event-key="none"]');
+
+      if (noEventsEl) {
+        noEventsEl.remove();
+      }
+
+    } else {
+      const noEventsEl = document.querySelector('.event-row[data-event-key="none"]');
+      waitForElement("#events-section").then(function (eventsList) {
+        if (!!eventsList && !noEventsEl) {
+          eventsList.insertAdjacentHTML("beforeend", `<div class="event-row" data-event-key="none"><p>No events</p></div>`);
+        }
+      });
+    }
+  }
+};
+
 let run = () => {
   handleCopyButtonClicks();
   sendMessage({ message: 'initialize_evoTools' });
@@ -237,7 +312,8 @@ chrome.runtime.onMessage.addListener((msg) => {
       setAllocationsAndConfirmations();
       setBlockExecutionStatus(msg.data.blockExecution);
       setEnvironmentValue(msg.data.envID);
-      setUidValue(msg.data.uid)
+      setUidValue(msg.data.uid);
+      setEvents();
   }
 });
 

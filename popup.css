@@ -209,14 +209,19 @@ button {
   flex: 1;
   z-index: var(--header-z-index);
   position: sticky;
-  top: 0px;
+  top: 0;
 }
 
-.section-header.allocations-title {
+.section-header.allocations-title, .section-header.events-title {
   position: sticky;
   top: var(--header-height);
   background: white;
   z-index: var(--header-z-index);
+  border-top: 2px solid #323638;
+}
+
+.section-header.events-title {
+  border-top: 2px solid #323638;
 }
 
 #header-row .evolv-name {
@@ -225,8 +230,7 @@ button {
 }
 
 #header-row .logo {
-  margin: 15px 0px;
-  margin-left: 21px;
+  margin: 15px 0 15px 21px;
 }
 
 button.settings-icon {
@@ -297,7 +301,40 @@ button#copy-debug-info span {
   fill: var(--green-success);
 }
 
-#experiment-section {
+#events-section > .event-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+#events-section > .event-row .timestamp-container {
+  display: flex;
+  min-width: 110px;
+  margin-left: 10px;
+}
+
+#events-section > .event-row .time-since {
+  margin: 0 10px 0 6px;
+}
+
+#events-section > .event-row:not(:last-of-type) {
+  border-bottom: 1px solid var(--border-color);
+}
+
+#events-section > .event-row > .event-name {
+  font-weight: bold;
+  margin-left: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#events-section .event-row {
+  min-height: 38px;
+}
+
+#experiment-section, #events-section {
   min-height: 50px;
 }
 
@@ -327,7 +364,7 @@ h2 {
   border-bottom: none;
 }
 
-.section-header {
+.section-header:not(:first-of-type) {
   height: 40px;
   line-height: 21px;
 }
@@ -336,9 +373,9 @@ h2 {
   margin: 0;
   padding-inline-start: 0;
   display: flex;
-  /* flex-direction: row; */
   list-style-type: none;
   padding: 0 10px;
+  align-items: center;
 }
 
 .experiment_row {
@@ -354,7 +391,7 @@ h2 {
   align-self: center;
 }
 
-.experiment_row ul:first-of-type li:first-child {
+.experiment_row ul:first-of-type li:first-child, #events-section > .event-row > .event.name  {
   width: 60%;
 }
 
@@ -376,7 +413,7 @@ h2 {
   padding-right: 10px;
 }
 
-.experiment_row .e-name{
+.experiment_row .e-name, .event-row .event-name {
   margin-left: 10px;
   line-height: 18px;
 }
