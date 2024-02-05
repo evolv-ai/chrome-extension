@@ -12,7 +12,7 @@ const injectScript = () => {
     document.body.appendChild(script);
 }
 
-window.addEventListener("load", (event) => {
+window.addEventListener("load", () => {
     injectScript()
 });
 
@@ -24,17 +24,13 @@ const waitForElement = async selector => {
 };
 
 waitForElement('script[src*="evolv.ai/asset-manager"]').then(script => {
-    const envID = script.dataset.evolvEnvironment;
-
-    initData.envID = envID;
-    if (isPopupOpen){
-        chrome.runtime.sendMessage({ message: 'evolv:envId', data: envID });
-    }
+    initData.envID = script.dataset.evolvEnvironment;
 });
 
 const bootstrap = () => {
     initData.uid = window.localStorage.getItem('evolv:uid') || '(empty)';
     initData.blockExecution = window.sessionStorage.getItem('evolv:blockExecution') || null;
+    initData.previewCid = window.sessionStorage.getItem('evolv:previewCid') || null;
 
     chrome.runtime.sendMessage({ message: 'evolv:initialData', data: initData });
 };
@@ -48,8 +44,9 @@ window.addEventListener('message', (e) => {
         case 'evolv:context':
             initData.remoteContext = e.data.data;
             if (isPopupOpen){
-                chrome.runtime.sendMessage({ message: 'evoTools:remoteContext', data: e.data.data });
+                chrome.runtime.sendMessage({ message: 'evolv:remoteContext' });
             }
+            break;
     }
 });
 
@@ -63,6 +60,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             window.sessionStorage.removeItem('evolv:blockExecution');
             window.location.reload();
             break;
+
         case 'disable_evolv':
             window.sessionStorage.setItem('evolv:blockExecution', 'true');
             window.location.reload();
@@ -75,11 +73,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             }, '*');
             bootstrap();
             break;
+
         case 'evolv_popup_closed':
-            isPopupOpen= false;
+            isPopupOpen = false;
             break;
+
         case 'ping_content_script':
             isPopupOpen = true;
+            break;
+
+        case 'set_preview_cid':
+            window.sessionStorage.setItem('evolv:previewCid', request.cid);
+            window.location.reload();
+            break;
+
+        case 'clear_preview_cid':
+            window.sessionStorage.removeItem('evolv:previewCid');
+            window.location.reload();
             break;
     }
 });
