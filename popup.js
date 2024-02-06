@@ -1,12 +1,23 @@
 let remoteContext = {};
-let contentJsLoaded = true;
+let environmentId = '';
+let experimentCandidates = new Map;
+let evolvUserId = '';
+let usePreviewId = false;
 
-const waitForElement = async (selector) => {
+const waitForElement = async (selector, timeout = 5000) => {
+  const startTime = Date.now();
+
   while (document.querySelector(selector) === null) {
+    if (Date.now() - startTime > timeout) {
+      throw new Error(`Timeout waiting for element with selector: ${selector}`);
+    }
+
     await new Promise((resolve) => requestAnimationFrame(resolve));
   }
+
   return document.querySelector(selector);
 };
+
 
 const sendMessage = function (message) {
   chrome.tabs.query({
@@ -42,9 +53,9 @@ const setUidValue = (uid) => {
   });
 };
 
-const setEnvironmentValue = (environmentValue) => {
+const setEnvironmentValue = (value) => {
   waitForElement("#envID").then(function (envInput) {
-      envInput.textContent = environmentValue || '(not set)';
+      envInput.textContent = value || '(not set)';
   });
 };
 
@@ -54,7 +65,8 @@ const handleExperimentRowClicks = () => {
 
     const clickAction = function (e) {
       let experimentRowEl = e.target.closest('.experiment_row');
-      if (experimentRowEl) {
+      let candidateSelect = e.target.closest('.candidate-select');
+      if (experimentRowEl && !candidateSelect) {
         experimentRowEl.classList.contains('hide-info') ? experimentRowEl.classList.remove('hide-info') : experimentRowEl.classList.add('hide-info');
       }
     }
@@ -80,7 +92,7 @@ const handleSettingsButtonClicks = () => {
 };
 
 const setAllocationsAndConfirmations = () => {
-  if (remoteContext && remoteContext.experiments && remoteContext.experiments.allocations) {
+  if (remoteContext) {
     const allocations = remoteContext.experiments.allocations;
     const confirmations = remoteContext.experiments.confirmations;
     const experimentNames = remoteContext.experimentNames;
@@ -90,49 +102,90 @@ const setAllocationsAndConfirmations = () => {
       confirmationCIDs = getConfirmationCIDs(confirmations);
     }
 
-    if (allocations.length > 0) {
+    if (allocations.length > 0 && experimentCandidates.size > 0) {
+      allocations.sort((a, b) => {
+        const eidA = a.eid;
+        const eidB = b.eid;
+
+        const nameA = experimentNames[eidA];
+        const nameB = experimentNames[eidB];
+
+        const isConfirmedA = confirmationCIDs.includes(a.cid);
+        const isConfirmedB = confirmationCIDs.includes(b.cid);
+
+        const excludedA = a.excluded;
+        const excludedB = b.excluded;
+
+        if (!excludedA && excludedB) {
+          return -1;
+        } else if (excludedA && !excludedB) {
+          return 1;
+        }
+
+        if (isConfirmedA && !isConfirmedB) {
+          return -1;
+        } else if (!isConfirmedA && isConfirmedB) {
+          return 1;
+        }
+
+        return nameA.localeCompare(nameB);
+
+      });
+
       for (let i = 0; i < allocations.length; i++) {
         const allocation = allocations[i];
+        const excluded = allocation.excluded;
+
         waitForElement("#experiment-section").then(function (experimentList) {
-          const expName = experimentNames[allocation.eid] ? experimentNames[allocation.eid] : allocation.eid
-          if (!document.querySelector(`.experiment_row[data-allocation="${allocation.cid}"]`) && !!experimentList) {
-            experimentList.insertAdjacentHTML(
-              "beforeend", `
-                <div class="experiment_row hide-info" data-allocation="${allocation.cid}">
-                  <ul class="experiment-title-bar">
-                    <li>
-                      <b class="e-name">${expName}</b>
-                    </li>
-                    <li class="combination">
-                      <p><span>Combination:</span> <span class="ordinal">${allocation.ordinal === undefined ? '-' : allocation.ordinal}</span></p>
-                    </li>
-                    <li>
-                      <div class="tooltip">
-                        <span>${
-                          confirmationCIDs.includes(allocation.cid)
-                          ? `<svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20" fill="none">
-                          <path d="M10.1 4.4L8.60001 6L11.5 8.9H0.100006V11.1H11.4L8.60001 14L10.2 15.6L15.8 10L10.1 4.4ZM18.1 17.8H9.20001V20H18.1C19.3 20 20.3 19 20.3 17.8V2.2C20.3 1 19.3 0 18.1 0H9.20001V2.2H18.1V17.8Z" fill="#71C97E"/>
-                          </svg>`
-                          : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
-                          <path d="M17.1 0.900002H8.2C7 0.900002 6 1.9 6 3.2V3.4C6.3 3.4 6.6 3.3 6.9 3.3C7.3 3.3 7.8 3.3 8.2 3.4V3.2H17.1V18.8H8.2V18.5C7.8 18.6 7.4 18.6 6.9 18.6C6.6 18.6 6.3 18.6 6 18.5V18.7C6 19.9 7 20.9 8.2 20.9H17.1C18.3 20.9 19.3 19.9 19.3 18.7V3.2C19.3 1.9 18.3 0.900002 17.1 0.900002Z" fill="#777777"/>
-                          <path d="M13.4 10.9C13.4 7.3 10.5 4.4 6.89999 4.4C3.29999 4.4 0.399994 7.3 0.399994 10.9C0.399994 14.5 3.29999 17.4 6.89999 17.4C10.5 17.4 13.4 14.5 13.4 10.9ZM12.1 10.9C12.1 13.8 9.79999 16.1 6.89999 16.1C5.79999 16.1 4.89999 15.8 3.99999 15.2L11.2 8C11.8 8.9 12.1 9.9 12.1 10.9ZM6.89999 5.7C7.89999 5.7 8.79999 6 9.59999 6.5L2.49999 13.6C1.99999 12.8 1.69999 11.9 1.69999 10.9C1.69999 8.1 4.09999 5.7 6.89999 5.7Z" fill="#777777"/>
-                          </svg>`
-                        }</span>
-                        <div class="tooltip-message">
-                          ${
-                            confirmationCIDs.includes(allocation.cid)
-                            ? 'This page is an entry point of this project'
-                            : 'This page is not an entry point for this project'
-                          }
+          const expName = experimentNames[allocation.eid] ? experimentNames[allocation.eid] : allocation.eid;
+          const candidateList = experimentCandidates.get(allocation.eid);
+          const combinationLabel = getCombinationLabel(candidateList, allocation.ordinal);
+
+          if (!document.querySelector(`.experiment_row[data-allocation="${allocation.eid}"]`) && !!experimentList) {
+              experimentList.insertAdjacentHTML(
+                "beforeend", `
+                <div class="experiment_row hide-info" data-allocation="${allocation.eid}">
+                  <div class="experiment-title-bar">
+                    <p>
+                      <strong class="e-name">${expName}</strong>
+                    </p>
+                    <div class="combination-container">
+                      ${excluded
+                        ? '<span class="excluded">Excluded</span>'
+                        : `
+                            <select name="candidate-select" class="candidate-select" id="select-${allocation.eid}">
+                              <option value="${allocation.cid}" selected>${combinationLabel}</option>
+                            </select>
+                          `
+                      }
+                      <div class="tooltip-arrow">
+                        <div class="tooltip ${excluded ? 'excluded' : ''}">
+                          <span>${
+                  confirmationCIDs.includes(allocation.cid)
+                    ? `<svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20" fill="none">
+                            <path d="M10.1 4.4L8.60001 6L11.5 8.9H0.100006V11.1H11.4L8.60001 14L10.2 15.6L15.8 10L10.1 4.4ZM18.1 17.8H9.20001V20H18.1C19.3 20 20.3 19 20.3 17.8V2.2C20.3 1 19.3 0 18.1 0H9.20001V2.2H18.1V17.8Z" fill="#71C97E"/>
+                            </svg>`
+                    : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
+                            <path d="M17.1 0.900002H8.2C7 0.900002 6 1.9 6 3.2V3.4C6.3 3.4 6.6 3.3 6.9 3.3C7.3 3.3 7.8 3.3 8.2 3.4V3.2H17.1V18.8H8.2V18.5C7.8 18.6 7.4 18.6 6.9 18.6C6.6 18.6 6.3 18.6 6 18.5V18.7C6 19.9 7 20.9 8.2 20.9H17.1C18.3 20.9 19.3 19.9 19.3 18.7V3.2C19.3 1.9 18.3 0.900002 17.1 0.900002Z" fill="#777777"/>
+                            <path d="M13.4 10.9C13.4 7.3 10.5 4.4 6.89999 4.4C3.29999 4.4 0.399994 7.3 0.399994 10.9C0.399994 14.5 3.29999 17.4 6.89999 17.4C10.5 17.4 13.4 14.5 13.4 10.9ZM12.1 10.9C12.1 13.8 9.79999 16.1 6.89999 16.1C5.79999 16.1 4.89999 15.8 3.99999 15.2L11.2 8C11.8 8.9 12.1 9.9 12.1 10.9ZM6.89999 5.7C7.89999 5.7 8.79999 6 9.59999 6.5L2.49999 13.6C1.99999 12.8 1.69999 11.9 1.69999 10.9C1.69999 8.1 4.09999 5.7 6.89999 5.7Z" fill="#777777"/>
+                            </svg>`
+                }</span>
+                          <div class="tooltip-message">
+                            ${
+                  confirmationCIDs.includes(allocation.cid)
+                    ? 'This page is an entry point of this project'
+                    : 'This page is not an entry point for this project'
+                }
+                          </div>
+                        </div>
+                        <div class="arrow-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="9" viewBox="0 0 12 9" fill="none">
+                            <path d="M10.6 0.624994L12 2.02499L6 8.02499L5.24537e-07 2.02499L1.4 0.624993L6 5.22499L10.6 0.624994Z" fill="#666666"/>
+                          </svg>
                         </div>
                       </div>
-                      <div class="arrow-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="9" viewBox="0 0 12 9" fill="none">
-                          <path d="M10.6 0.624994L12 2.02499L6 8.02499L5.24537e-07 2.02499L1.4 0.624993L6 5.22499L10.6 0.624994Z" fill="#666666"/>
-                        </svg>
-                      </div>
-                    </li>
-                  </ul>
+                    </div>
+                  </div>
                   <ul class="additional_info">
 
                     <li><p><b>uid:</b> <span class="conf_uid">${allocation.uid}</span></p></li>
@@ -144,7 +197,22 @@ const setAllocationsAndConfirmations = () => {
                   </ul>
                 </div>
               `
-            );
+              );
+            }
+
+          if (candidateList.length > 1 && !allocation.excluded) {
+            waitForElement(`#select-${allocation.eid}`).then(function (select) {
+              select.innerHTML = candidateList.map(candidate => {
+                const combinationLabel = getCombinationLabel(candidateList, candidate.ordinal);
+
+                return `<option value="${candidate.id}" ${candidate.id === allocation.cid ? 'selected' : ''}>${combinationLabel}</option>`
+              }).join('');
+
+              select.addEventListener('change', function (e) {
+                const cid = e.target.value;
+                setPreviewCid(cid);
+              });
+            });
           }
         });
       }
@@ -159,12 +227,29 @@ const setAllocationsAndConfirmations = () => {
       const noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
       waitForElement("#experiment-section").then(function (experimentList) {
         if (!!experimentList && !noAllocationsEl) {
-          experimentList.insertAdjacentHTML("beforeend", `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No allocations</p></div>`);
+          experimentList.insertAdjacentHTML("beforeend", `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No active projects</p></div>`);
         }
       });
     }
   }
 };
+
+const getCombinationLabel = (candidates, ordinal) => {
+  candidates.sort((a, b) => a.ordinal - b.ordinal);
+  const isControl = ordinal === candidates[0].ordinal;
+
+  return `${ordinal}${isControl ? ' (Control)' : ''}`;
+}
+
+const setPreviewCid = (cid) => {
+  sendMessage({ message: 'set_preview_cid', cid });
+  window.close();
+}
+
+const clearPreviewCid = () => {
+  sendMessage({ message: 'clear_preview_cid' });
+  window.close();
+}
 
 const handleCopyButtonClicks = () => {
   waitForElement('#copy-debug-info').then(function (copyButton) {
@@ -189,13 +274,21 @@ const handleCopyButtonClicks = () => {
   });
 };
 
+const handleClearSelectionClicks = async () => {
+  waitForElement('#clear-selection').then(function (clear) {
+    usePreviewId ? clear.classList.add('active') : clear.classList.remove('active');
+
+    clear.addEventListener('click', function () {
+      clearPreviewCid();
+    });
+  });
+}
+
 const setBlockExecutionStatus = (blockExecutionValue) => {
   waitForElement("#block-execution-toggle input").then(function (toggleInput) {
-    if (blockExecutionValue) {
-      toggleInput.checked = false;
-    } else {
-      toggleInput.checked = true;
-    }
+    blockExecutionValue
+      ? toggleInput.checked = false
+      : toggleInput.checked = true;
 
     toggleInput.addEventListener('click', function (e) {
       removeAllocations();
@@ -247,7 +340,6 @@ const setEvents = () => {
 
         waitForElement("#events-section").then(function (eventsList) {
           const eventName = event.type;
-          console.log(event.name);
           const eventTime = new Date(event.timestamp).toLocaleTimeString();
           const eventUniqueKey = `${eventName}.${event.timestamp}`;
           const timeSince = formatTimeAgo(event.timestamp);
@@ -285,9 +377,35 @@ const setEvents = () => {
   }
 };
 
+const setConfig = async () => {
+  if (environmentId) {
+    try {
+      await chrome.runtime.sendMessage({type: 'evolv:environmentConfig', envId: environmentId}, response => {
+        if (response.data) {
+          const experiments = response.data._experiments;
+
+          if (experiments && experiments.length) {
+            for (let i = 0; i < experiments.length; i++) {
+              experimentCandidates.set(experiments[i].id, experiments[i]._candidates);
+            }
+          }
+        } else {
+          console.error("Fetch environment config failed: ", response.error);
+        }
+
+        setAllocationsAndConfirmations();
+      });
+    } catch (error) {
+      console.error("Fetch environment config failed: ", error);
+    }
+  }
+
+  return true;
+}
+
 let run = () => {
-  handleCopyButtonClicks();
   sendMessage({ message: 'initialize_evoTools' });
+  handleCopyButtonClicks();
 }
 
 setInterval(() => {
@@ -297,23 +415,26 @@ setInterval(() => {
 
 chrome.runtime.onMessage.addListener((msg) => {
   switch (msg.message) {
-    case 'evoTools:remoteContext':
-      remoteContext = msg.data;
+    case 'evolv:remoteContext':
       setAllocationsAndConfirmations();
       break;
+
     case 'evolv:blockExecution':
       setBlockExecutionStatus(msg.data);
       break;
-    case 'evolv:envId':
-      setEnvironmentValue(msg.data);
-      break;
+
     case 'evolv:initialData':
       remoteContext = msg.data.remoteContext;
-      setAllocationsAndConfirmations();
+      environmentId = msg.data.envID;
+      evolvUserId = msg.data.uid;
+      usePreviewId = !!msg.data.previewCid;
+      handleClearSelectionClicks();
+      setEnvironmentValue(environmentId);
       setBlockExecutionStatus(msg.data.blockExecution);
-      setEnvironmentValue(msg.data.envID);
       setUidValue(msg.data.uid);
+      setConfig();
       setEvents();
+      break;
   }
 });
 

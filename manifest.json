@@ -1,12 +1,16 @@
 {
   "name": "Evolv AI",
   "description": "Display information about Evolv AI optimizations",
-  "version": "1.0",
+  "version": "1.2",
   "manifest_version": 3,
   "host_permissions": [
-
+    "https://participants.evolv.ai/*",
+    "https://participants-stg.evolv.ai/*"
   ],
   "permissions": [],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": [
