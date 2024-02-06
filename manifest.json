@@ -7,11 +7,7 @@
     "https://participants.evolv.ai/*",
     "https://participants-stg.evolv.ai/*"
   ],
-  "permissions": [
-    "tabs",
-    "storage",
-    "activeTab"
-  ],
+  "permissions": [],
   "background": {
     "service_worker": "background.js"
   },

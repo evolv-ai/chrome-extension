@@ -222,26 +222,31 @@ button {
 
 .row.section-header.allocations-title {
   display: grid;
-  grid-template-columns: 1fr 200px;
+  grid-template-columns: 1fr 180px;
   align-items: center;
-  justify-content: space-between;
 }
 
-.section-header.allocations-title > span {
-  margin-right: 10px;
-  white-space: nowrap;
+.combinations-header-container {
+  display: flex;
+  justify-content: flex-start;
 }
 
-.section-header.allocations-title > span > a, .section-header.allocations-title > span > a:visited {
-  color: inherit;
-}
-
-.section-header.allocations-title > span > a:hover {
-  text-decoration: none;
+.combinations-header {
+  padding: 0;
+  width: auto;
 }
 
 #clear-selection:not(.active) {
   visibility: hidden;
+}
+
+#clear-selection, #clear-selection:visited {
+  margin-left: 6px;
+  color: inherit;
+}
+
+#clear-selection:hover {
+  text-decoration: none;
 }
 
 .section-header.events-title {
@@ -487,7 +492,7 @@ ul.additional_info li p b {
 
 .experiment-title-bar {
   display: grid;
-  grid-template-columns: auto 200px;
+  grid-template-columns: 1fr 180px;
   gap: 10px;
   cursor: pointer;
   position: relative;
@@ -541,6 +546,14 @@ ul.additional_info li p b {
 
 select {
   cursor: pointer;
+}
+
+.candidate-select {
+  padding: 4px;
+  border-color: #cccccc;
+  border-radius: 4px;
+  width: 100%;
+  margin-right: 10px;
 }
 
 /* TOGGLE SWITCH */
@@ -660,4 +673,8 @@ input:checked+.slider:before {
 
 .tooltip-arrow {
   display: flex;
+}
+
+.tooltip-arrow > .tooltip.excluded {
+  visibility: hidden;
 }

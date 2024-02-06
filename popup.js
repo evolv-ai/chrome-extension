@@ -53,9 +53,9 @@ const setUidValue = (uid) => {
   });
 };
 
-const setEnvironmentValue = () => {
+const setEnvironmentValue = (value) => {
   waitForElement("#envID").then(function (envInput) {
-      envInput.textContent = environmentId || '(not set)';
+      envInput.textContent = value || '(not set)';
   });
 };
 
@@ -92,7 +92,7 @@ const handleSettingsButtonClicks = () => {
 };
 
 const setAllocationsAndConfirmations = () => {
-  if (remoteContext && experimentCandidates.size > 0 ) {
+  if (remoteContext) {
     const allocations = remoteContext.experiments.allocations;
     const confirmations = remoteContext.experiments.confirmations;
     const experimentNames = remoteContext.experimentNames;
@@ -102,7 +102,7 @@ const setAllocationsAndConfirmations = () => {
       confirmationCIDs = getConfirmationCIDs(confirmations);
     }
 
-    if (allocations.length > 0) {
+    if (allocations.length > 0 && experimentCandidates.size > 0) {
       allocations.sort((a, b) => {
         const eidA = a.eid;
         const eidB = b.eid;
@@ -157,9 +157,9 @@ const setAllocationsAndConfirmations = () => {
                               <option value="${allocation.cid}" selected>${combinationLabel}</option>
                             </select>
                           `
-                }
+                      }
                       <div class="tooltip-arrow">
-                        <div class="tooltip">
+                        <div class="tooltip ${excluded ? 'excluded' : ''}">
                           <span>${
                   confirmationCIDs.includes(allocation.cid)
                     ? `<svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20" fill="none">
@@ -227,7 +227,7 @@ const setAllocationsAndConfirmations = () => {
       const noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
       waitForElement("#experiment-section").then(function (experimentList) {
         if (!!experimentList && !noAllocationsEl) {
-          experimentList.insertAdjacentHTML("beforeend", `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No allocations</p></div>`);
+          experimentList.insertAdjacentHTML("beforeend", `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No active projects</p></div>`);
         }
       });
     }
@@ -235,9 +235,10 @@ const setAllocationsAndConfirmations = () => {
 };
 
 const getCombinationLabel = (candidates, ordinal) => {
+  candidates.sort((a, b) => a.ordinal - b.ordinal);
   const isControl = ordinal === candidates[0].ordinal;
 
-  return `Combination ${ordinal}${isControl ? ' (C)' : ''}`;
+  return `${ordinal}${isControl ? ' (Control)' : ''}`;
 }
 
 const setPreviewCid = (cid) => {
@@ -428,7 +429,7 @@ chrome.runtime.onMessage.addListener((msg) => {
       evolvUserId = msg.data.uid;
       usePreviewId = !!msg.data.previewCid;
       handleClearSelectionClicks();
-      setEnvironmentValue();
+      setEnvironmentValue(environmentId);
       setBlockExecutionStatus(msg.data.blockExecution);
       setUidValue(msg.data.uid);
       setConfig();
