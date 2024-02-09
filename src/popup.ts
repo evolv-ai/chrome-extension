@@ -1,31 +1,23 @@
-let remoteContext = {};
+import { waitForElement } from './shared/utils';
+import { BlockExecution, Candidate, Confirmation, RemoteContext } from './types';
+
+let remoteContext: RemoteContext = {};
 let environmentId = '';
 let experimentCandidates = new Map;
 let evolvUserId = '';
 let usePreviewId = false;
 
-const waitForElement = async (selector, timeout = 5000) => {
-  const startTime = Date.now();
+// message plus any number of optional props
 
-  while (document.querySelector(selector) === null) {
-    if (Date.now() - startTime > timeout) {
-      throw new Error(`Timeout waiting for element with selector: ${selector}`);
-    }
-
-    await new Promise((resolve) => requestAnimationFrame(resolve));
-  }
-
-  return document.querySelector(selector);
-};
-
-
-const sendMessage = function (message) {
+const sendMessage = function (message: any) {
   chrome.tabs.query({
     currentWindow: true,
     active: true
   }, function (tabs) {
-    var activeTab = tabs[0];
-    chrome.tabs.sendMessage(activeTab.id, message);
+    var activeTab: chrome.tabs.Tab = tabs[0];
+    if (activeTab && activeTab.id) {
+      chrome.tabs.sendMessage(activeTab.id, message);
+    }
   });
 };
 
@@ -36,10 +28,10 @@ const removeAllocations = () => {
     experimentSection.innerHTML = `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No allocations</p></div>`;
 };
 
-const getConfirmationCIDs = (confirmations) => {
-  if (!confirmations) return null;
+const getConfirmationCIDs = (confirmations: Confirmation[]): string[] => {
+  if (!confirmations) return [];
 
-  let confirmationCIDs = [];
+  let confirmationCIDs: string[] = [];
   Array.prototype.forEach.call(confirmations, function (confirmation) {
     let cid = confirmation.cid;
     confirmationCIDs.push(cid);
@@ -47,13 +39,13 @@ const getConfirmationCIDs = (confirmations) => {
   return confirmationCIDs;
 };
 
-const setUidValue = (uid) => {
+const setUidValue = (uid: string) => {
   waitForElement("#evolv_uid").then(function (uidInput) {
     uidInput.textContent = uid || '(not set)';
   });
 };
 
-const setEnvironmentValue = (value) => {
+const setEnvironmentValue = (value: string) => {
   waitForElement("#envID").then(function (envInput) {
       envInput.textContent = value || '(not set)';
   });
@@ -63,7 +55,7 @@ const handleExperimentRowClicks = () => {
   waitForElement('.experiment-title-bar').then(function () {
     let experimentRows = document.querySelectorAll('.experiment-title-bar');
 
-    const clickAction = function (e) {
+    const clickAction = function (e: any) {
       let experimentRowEl = e.target.closest('.experiment_row');
       let candidateSelect = e.target.closest('.candidate-select');
       if (experimentRowEl && !candidateSelect) {
@@ -92,12 +84,12 @@ const handleSettingsButtonClicks = () => {
 };
 
 const setAllocationsAndConfirmations = () => {
-  if (remoteContext) {
+  if (remoteContext && remoteContext.experiments) {
     const allocations = remoteContext.experiments.allocations;
     const confirmations = remoteContext.experiments.confirmations;
     const experimentNames = remoteContext.experimentNames;
 
-    let confirmationCIDs = [];
+    let confirmationCIDs: string[] = [];
     if (confirmations) {
       confirmationCIDs = getConfirmationCIDs(confirmations);
     }
@@ -137,9 +129,9 @@ const setAllocationsAndConfirmations = () => {
         const excluded = allocation.excluded;
 
         waitForElement("#experiment-section").then(function (experimentList) {
-          const expName = experimentNames[allocation.eid] ? experimentNames[allocation.eid] : allocation.eid;
-          const candidateList = experimentCandidates.get(allocation.eid);
-          const combinationLabel = getCombinationLabel(candidateList, allocation.ordinal);
+          const expName: string = experimentNames[allocation.eid] ? experimentNames[allocation.eid] : allocation.eid;
+          const candidateList: Candidate[] = experimentCandidates.get(allocation.eid);
+          const combinationLabel: string = getCombinationLabel(candidateList, allocation.ordinal);
 
           if (!document.querySelector(`.experiment_row[data-allocation="${allocation.eid}"]`) && !!experimentList) {
               experimentList.insertAdjacentHTML(
@@ -208,7 +200,7 @@ const setAllocationsAndConfirmations = () => {
                 return `<option value="${candidate.id}" ${candidate.id === allocation.cid ? 'selected' : ''}>${combinationLabel}</option>`
               }).join('');
 
-              select.addEventListener('change', function (e) {
+              select.addEventListener('change', function (e: any) {
                 const cid = e.target.value;
                 setPreviewCid(cid);
               });
@@ -234,14 +226,14 @@ const setAllocationsAndConfirmations = () => {
   }
 };
 
-const getCombinationLabel = (candidates, ordinal) => {
+const getCombinationLabel = (candidates: Candidate[], ordinal: number) => {
   candidates.sort((a, b) => a.ordinal - b.ordinal);
   const isControl = ordinal === candidates[0].ordinal;
 
   return `${ordinal}${isControl ? ' (Control)' : ''}`;
 }
 
-const setPreviewCid = (cid) => {
+const setPreviewCid = (cid: string) => {
   sendMessage({ message: 'set_preview_cid', cid });
   window.close();
 }
@@ -284,13 +276,13 @@ const handleClearSelectionClicks = async () => {
   });
 }
 
-const setBlockExecutionStatus = (blockExecutionValue) => {
+const setBlockExecutionStatus = (blockExecutionValue: BlockExecution) => {
   waitForElement("#block-execution-toggle input").then(function (toggleInput) {
     blockExecutionValue
       ? toggleInput.checked = false
       : toggleInput.checked = true;
 
-    toggleInput.addEventListener('click', function (e) {
+    toggleInput.addEventListener('click', function (e: any) {
       removeAllocations();
       if (!toggleInput.checked) {
         sendMessage({ message: 'disable_evolv' });
@@ -308,13 +300,18 @@ const timeFormatter = new Intl.RelativeTimeFormat(undefined, {
   style: "narrow"
 })
 
-const DIVISIONS = [
+type Division = {
+  amount: number;
+  name: "seconds" | "minutes" | "hours";
+}
+
+const DIVISIONS: Division[] = [
   { amount: 60, name: "seconds" },
   { amount: 60, name: "minutes" },
   { amount: 24, name: "hours" }
 ]
 
-function formatTimeAgo(timestamp) {
+function formatTimeAgo(timestamp: number) {
   let duration = (timestamp - Date.now()) / 1000;
 
   for (let i = 0; i < DIVISIONS.length; i++) {
@@ -380,7 +377,7 @@ const setEvents = () => {
 const setConfig = async () => {
   if (environmentId) {
     try {
-      await chrome.runtime.sendMessage({type: 'evolv:environmentConfig', envId: environmentId}, response => {
+      chrome.runtime.sendMessage({type: 'evolv:environmentConfig', envId: environmentId}, response => {
         if (response.data) {
           const experiments = response.data._experiments;
 

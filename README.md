@@ -33,8 +33,11 @@ We use `injectScript.js` to get the evolv remotecontext and send it to `evolvToo
 
 ---
 
-## Future Ideas 
-* Log events as they are triggered.
+## Running locally
+* `npm run build` will build the extension and place it in the `dist` directory.  You can then load the extension from the `dist` directory in Chrome.
+* `npm run watch` will watch for changes and rebuild the extension as you make changes.
+
+## Future Ideas
 * Link each combinations to the experiment in the manager
 * List audiences user has qualified for
 * Select desired combination - would likely need to talk to the manager

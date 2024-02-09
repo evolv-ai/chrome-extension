@@ -1,4 +1,14 @@
-const initData = {};
+import { waitForElement } from './shared/utils';
+import { InitData } from './types';
+
+
+const initData: InitData = {
+    remoteContext: {},
+    envID: '',
+    uid: '',
+    blockExecution: null,
+    previewCid: null
+};
 let isPopupOpen = false
 
 const injectScript = () => {
@@ -15,13 +25,6 @@ const injectScript = () => {
 window.addEventListener("load", () => {
     injectScript()
 });
-
-const waitForElement = async selector => {
-    while (document.querySelector(selector) === null) {
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-    }
-    return document.querySelector(selector);
-};
 
 waitForElement('script[src*="evolv.ai/asset-manager"]').then(script => {
     initData.envID = script.dataset.evolvEnvironment;
