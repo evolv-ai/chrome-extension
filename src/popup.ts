@@ -1,11 +1,13 @@
 import { waitForElement } from './shared/utils';
-import { BlockExecution, Candidate, Confirmation, RemoteContext } from './types';
+import { BlockExecution, Candidate, Confirmation, RemoteContext, Stage } from './types';
+import { strings } from './shared/variables';
 
 let remoteContext: RemoteContext = {};
 let environmentId = '';
 let experimentCandidates = new Map;
 let evolvUserId = '';
 let usePreviewId = false;
+let snippetIsDisabled = false;
 
 // message plus any number of optional props
 
@@ -25,7 +27,7 @@ const removeAllocations = () => {
   let experimentSection = document.getElementById('experiment-section')
   let noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
   if (experimentSection && !noAllocationsEl)
-    experimentSection.innerHTML = `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No allocations</p></div>`;
+    experimentSection.innerHTML = `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No active projects</p></div>`;
 };
 
 const getConfirmationCIDs = (confirmations: Confirmation[]): string[] => {
@@ -84,7 +86,7 @@ const handleSettingsButtonClicks = () => {
 };
 
 const setAllocationsAndConfirmations = () => {
-  if (remoteContext && remoteContext.experiments) {
+  if (remoteContext && remoteContext.experiments && !snippetIsDisabled) {
     const allocations = remoteContext.experiments.allocations;
     const confirmations = remoteContext.experiments.confirmations;
     const experimentNames = remoteContext.experimentNames;
@@ -235,11 +237,13 @@ const getCombinationLabel = (candidates: Candidate[], ordinal: number) => {
 
 const setPreviewCid = (cid: string) => {
   sendMessage({ message: 'set_preview_cid', cid });
+  sendMessage({ message: 'evolv_popup_closed' });
   window.close();
 }
 
 const clearPreviewCid = () => {
   sendMessage({ message: 'clear_preview_cid' });
+  sendMessage({ message: 'evolv_popup_closed' });
   window.close();
 }
 
@@ -278,18 +282,42 @@ const handleClearSelectionClicks = async () => {
 
 const setBlockExecutionStatus = (blockExecutionValue: BlockExecution) => {
   waitForElement("#block-execution-toggle input").then(function (toggleInput) {
-    blockExecutionValue
-      ? toggleInput.checked = false
-      : toggleInput.checked = true;
+    switch (blockExecutionValue) {
+      case strings.snippet.disabled:
+        toggleInput.checked = false;
+        toggleInput.nextElementSibling.classList.add('disabled');
+        toggleInput.removeAttribute('disabled');
+        toggleInput.parentElement.previousElementSibling.textContent = strings.snippet.disabled;
+        snippetIsDisabled = true;
+        removeAllocations();
+        break;
 
-    toggleInput.addEventListener('click', function (e: any) {
+      case strings.snippet.enabled:
+        toggleInput.checked = true;
+        toggleInput.nextElementSibling.classList.remove('disabled');
+        toggleInput.removeAttribute('disabled');
+        toggleInput.parentElement.previousElementSibling.textContent = strings.snippet.enabled;
+        snippetIsDisabled = false;
+        setAllocationsAndConfirmations();
+        break;
+
+      case strings.snippet.notDetected:
+        toggleInput.checked = false;
+        toggleInput.nextElementSibling.classList.add('disabled');
+        toggleInput.setAttribute('disabled', true);
+        toggleInput.parentElement.previousElementSibling.textContent = strings.snippet.notDetected;
+        removeAllocations();
+        break;
+    }
+
+    toggleInput.addEventListener('click', function (e) {
       removeAllocations();
       if (!toggleInput.checked) {
         sendMessage({ message: 'disable_evolv' });
-        e.target.parentElement.previousElementSibling.textContent = 'Snippet Disabled';
+        e.target.parentElement.previousElementSibling.textContent = strings.snippet.disabled;
       } else {
         sendMessage({ message: 'enable_evolv' });
-        e.target.parentElement.previousElementSibling.textContent = 'Snippet Enabled';
+        e.target.parentElement.previousElementSibling.textContent = strings.snippet.enabled;
       }
     });
   });
@@ -374,10 +402,10 @@ const setEvents = () => {
   }
 };
 
-const setConfig = async () => {
+const setConfig = async (stage: Stage) => {
   if (environmentId) {
     try {
-      chrome.runtime.sendMessage({type: 'evolv:environmentConfig', envId: environmentId}, response => {
+      chrome.runtime.sendMessage({type: 'evolv:environmentConfig', envId: environmentId, stage}, response => {
         if (response.data) {
           const experiments = response.data._experiments;
 
@@ -387,7 +415,7 @@ const setConfig = async () => {
             }
           }
         } else {
-          console.error("Fetch environment config failed: ", response.error);
+          console.error("Fetch environment config error: ", response.error);
         }
 
         setAllocationsAndConfirmations();
@@ -413,11 +441,12 @@ setInterval(() => {
 chrome.runtime.onMessage.addListener((msg) => {
   switch (msg.message) {
     case 'evolv:remoteContext':
+      snippetIsDisabled = msg.data.snippetIsDisabled;
       setAllocationsAndConfirmations();
       break;
 
     case 'evolv:blockExecution':
-      setBlockExecutionStatus(msg.data);
+      setBlockExecutionStatus(msg.data.blockExecution);
       break;
 
     case 'evolv:initialData':
@@ -429,7 +458,7 @@ chrome.runtime.onMessage.addListener((msg) => {
       setEnvironmentValue(environmentId);
       setBlockExecutionStatus(msg.data.blockExecution);
       setUidValue(msg.data.uid);
-      setConfig();
+      setConfig(msg.data.stage);
       setEvents();
       break;
   }

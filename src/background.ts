@@ -1,6 +1,16 @@
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'evolv:environmentConfig') {
-    const url = 'https://participants.evolv.ai/v1/' + request.envId;
+import { Stage } from './types';
+
+interface Request {
+  type: string;
+  stage: Stage;
+  envId: string;
+}
+
+chrome.runtime.onMessage.addListener(({ type, stage, envId }: Request, sender, sendMessage): boolean => {
+  if (type === 'evolv:environmentConfig') {
+    const url: string = stage === Stage.Development
+      ? `participants-newdev.evolvdev.com/v1/${envId}`
+      : `https://participants${stage}.evolv.ai/v1/${envId}`;
 
     fetch(url, {
       method: "GET",
@@ -10,10 +20,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     })
       .then(response => response.json())
       .then(data => {
-        sendResponse({ data });
+        sendMessage({ data });
       })
       .catch(error => {
-        sendResponse({ error: error.message });
+        sendMessage({ error: error.message });
       });
   }
 

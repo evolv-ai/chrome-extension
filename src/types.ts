@@ -33,8 +33,16 @@ export interface InitData {
 	remoteContext: RemoteContext;
 	envID: string;
 	uid: string;
-	blockExecution: BlockExecution;
+	blockExecution?: BlockExecution;
 	previewCid: string | null;
+	stage: Stage | null;
+	snippetIsDisabled: boolean;
+}
+
+export enum Stage {
+	Staging = '-stg',
+	Production = '',
+	Development = 'development'
 }
 
 export type BlockExecution = string | null;
