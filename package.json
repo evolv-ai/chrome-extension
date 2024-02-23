@@ -1,0 +1,39 @@
+{
+  "name": "chrome-extension",
+  "version": "1.0.0",
+  "description": "## Getting Started --- #### **1)** In this Github project, click the green `Code` button and choose `Download ZIP`.  Save the zip file somewhere that you're not going to delete it by accident.  Once downloaded, open the zip file and you should see a directory named `evotools-main`. <img src=\"https://imgur.com/8hvUBj4.png\"/>",
+  "main": "src/background.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm-run-all build:*",
+    "build:scripts": "rollup -c",
+    "build:sass": "sass src/styles:dist",
+    "watch:scripts": "rollup -c --watch",
+    "watch:sass": "sass --watch src/styles:dist",
+    "watch": "npm-run-all --parallel watch:*",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "prewatch": "npm run clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evolv-ai/chrome-extension.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/evolv-ai/chrome-extension/issues"
+  },
+  "homepage": "https://github.com/evolv-ai/chrome-extension#readme",
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/chrome": "^0.0.260",
+    "npm-run-all": "^4.1.5",
+    "rollup": "^4.9.6",
+    "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-sass": "^1.12.21",
+    "sass": "^1.70.0",
+    "typescript": "^5.3.3"
+  }
+}
