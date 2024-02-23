@@ -9,7 +9,7 @@ interface Request {
 chrome.runtime.onMessage.addListener(({ type, stage, envId }: Request, sender, sendMessage): boolean => {
   if (type === 'evolv:environmentConfig') {
     const url: string = stage === Stage.Development
-      ? `participants-newdev.evolvdev.com/v1/${envId}`
+      ? `https://participants-newdev.evolvdev.com/v1/${envId}`
       : `https://participants${stage}.evolv.ai/v1/${envId}`;
 
     fetch(url, {

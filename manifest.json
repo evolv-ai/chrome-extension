@@ -1,7 +1,7 @@
 {
   "name": "Evolv AI",
   "description": "Display information about Evolv AI optimizations",
-  "version": "1.3",
+  "version": "1.3.0",
   "manifest_version": 3,
   "host_permissions": [
     "https://participants.evolv.ai/*",

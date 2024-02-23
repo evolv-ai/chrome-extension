@@ -1,13 +1,17 @@
-export const waitForElement = async (selector: any, timeout = 5000) => {
-	const startTime = Date.now();
+export const waitForElement = async (selector: any, timeout = 5000, interval = 100) => {
+	const endTime = performance.now() + timeout;
 
-	while (document.querySelector(selector) === null) {
-		if (Date.now() - startTime > timeout) {
+	const poll = async (resolve: (element: Element | null) => void) => {
+		const element = document.querySelector(selector);
+
+		if (element !== null) {
+			resolve(element);
+		} else if (performance.now() < endTime) {
+			setTimeout(() => poll(resolve), interval);
+		} else {
 			throw new Error(`Timeout waiting for element with selector: ${selector}`);
 		}
+	};
 
-		await new Promise((resolve) => requestAnimationFrame(resolve));
-	}
-
-	return document.querySelector(selector);
+	return new Promise((resolve) => poll(resolve));
 };

@@ -52,18 +52,22 @@ const waitForEvolv = async () => {
       ? strings.snippet.disabled
       : strings.snippet.notDetected;
 
-    waitForElement('script[src*="evolv.ai/asset-manager"]').then(script => {
-        initData.envID = script.dataset.evolvEnvironment;
-        const evolvEndpoint = script.dataset.evolvEndpoint;
-        initData.stage = getStage(evolvEndpoint);
-        initData.blockExecution = window.sessionStorage.getItem('evolv:blockExecution')
-          ? strings.snippet.disabled
-          : strings.snippet.enabled;
+    try {
+        const script: HTMLScriptElement | unknown = await waitForElement('script[src*="evolv.ai/asset-manager"]');
 
-        chrome.runtime.sendMessage({message: 'evolv:initialData', data: initData});
-    }).catch(() => {
+        if (script instanceof HTMLScriptElement) {
+            initData.envID = script.dataset.evolvEnvironment;
+            const evolvEndpoint = script.dataset.evolvEndpoint;
+            initData.stage = getStage(evolvEndpoint);
+            initData.blockExecution = window.sessionStorage.getItem('evolv:blockExecution')
+              ? strings.snippet.disabled
+              : strings.snippet.enabled;
+
+            await chrome.runtime.sendMessage({ message: 'evolv:initialData', data: initData });
+        }
+    } catch {
         console.log('Evolv AI snippet not detected');
-    });
+    }
 }
 
 const bootstrap = () => {

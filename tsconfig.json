@@ -6,6 +6,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": false,
     "skipLibCheck": true,
+    "lib": ["dom"],
   },
   "allowJs": true,
   "include": ["src/**/*.ts"],
