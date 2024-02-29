@@ -1,11 +1,13 @@
 import { waitForElement } from './shared/utils';
-import { BlockExecution, Candidate, Confirmation, RemoteContext } from './types';
+import { BlockExecution, Candidate, Confirmation, RemoteContext, Stage } from './types';
+import { strings } from './shared/variables';
 
 let remoteContext: RemoteContext = {};
 let environmentId = '';
 let experimentCandidates = new Map;
 let evolvUserId = '';
 let usePreviewId = false;
+let snippetIsDisabled = false;
 
 // message plus any number of optional props
 
@@ -14,7 +16,7 @@ const sendMessage = function (message: any) {
     currentWindow: true,
     active: true
   }, function (tabs) {
-    var activeTab: chrome.tabs.Tab = tabs[0];
+    const activeTab: chrome.tabs.Tab = tabs[0];
     if (activeTab && activeTab.id) {
       chrome.tabs.sendMessage(activeTab.id, message);
     }
@@ -25,7 +27,7 @@ const removeAllocations = () => {
   let experimentSection = document.getElementById('experiment-section')
   let noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
   if (experimentSection && !noAllocationsEl)
-    experimentSection.innerHTML = `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No allocations</p></div>`;
+    experimentSection.innerHTML = `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No active projects</p></div>`;
 };
 
 const getConfirmationCIDs = (confirmations: Confirmation[]): string[] => {
@@ -40,13 +42,13 @@ const getConfirmationCIDs = (confirmations: Confirmation[]): string[] => {
 };
 
 const setUidValue = (uid: string) => {
-  waitForElement("#evolv_uid").then(function (uidInput) {
+  waitForElement("#evolv_uid").then(function (uidInput: HTMLElement) {
     uidInput.textContent = uid || '(not set)';
   });
 };
 
 const setEnvironmentValue = (value: string) => {
-  waitForElement("#envID").then(function (envInput) {
+  waitForElement("#envID").then(function (envInput: HTMLElement) {
       envInput.textContent = value || '(not set)';
   });
 };
@@ -55,15 +57,15 @@ const handleExperimentRowClicks = () => {
   waitForElement('.experiment-title-bar').then(function () {
     let experimentRows = document.querySelectorAll('.experiment-title-bar');
 
-    const clickAction = function (e: any) {
-      let experimentRowEl = e.target.closest('.experiment_row');
-      let candidateSelect = e.target.closest('.candidate-select');
+    const clickAction = function (e: MouseEvent) {
+      let experimentRowEl = (e.target as HTMLElement).closest('.experiment_row');
+      let candidateSelect = (e.target as HTMLElement).closest('.candidate-select');
       if (experimentRowEl && !candidateSelect) {
         experimentRowEl.classList.contains('hide-info') ? experimentRowEl.classList.remove('hide-info') : experimentRowEl.classList.add('hide-info');
       }
     }
 
-    Array.prototype.forEach.call(experimentRows, function (titleBar) {
+    Array.prototype.forEach.call(experimentRows, function (titleBar: HTMLElement) {
       if(!titleBar.classList.contains('visited')) {
 
         titleBar.classList.add('visited');
@@ -74,17 +76,17 @@ const handleExperimentRowClicks = () => {
 };
 
 const handleSettingsButtonClicks = () => {
-  waitForElement("button.settings-icon").then(function (settingsButton) {
+  waitForElement("button.settings-icon").then(function (settingsButton: HTMLElement) {
     settingsButton.addEventListener("click", function () {
       chrome.tabs.create({
         url: "settings.html",
-      });
+      }).then();
     });
   });
 };
 
 const setAllocationsAndConfirmations = () => {
-  if (remoteContext && remoteContext.experiments) {
+  if (remoteContext && remoteContext.experiments && !snippetIsDisabled) {
     const allocations = remoteContext.experiments.allocations;
     const confirmations = remoteContext.experiments.confirmations;
     const experimentNames = remoteContext.experimentNames;
@@ -128,7 +130,7 @@ const setAllocationsAndConfirmations = () => {
         const allocation = allocations[i];
         const excluded = allocation.excluded;
 
-        waitForElement("#experiment-section").then(function (experimentList) {
+        waitForElement("#experiment-section").then(function (experimentList: HTMLElement) {
           const expName: string = experimentNames[allocation.eid] ? experimentNames[allocation.eid] : allocation.eid;
           const candidateList: Candidate[] = experimentCandidates.get(allocation.eid);
           const combinationLabel: string = getCombinationLabel(candidateList, allocation.ordinal);
@@ -193,7 +195,7 @@ const setAllocationsAndConfirmations = () => {
             }
 
           if (candidateList.length > 1 && !allocation.excluded) {
-            waitForElement(`#select-${allocation.eid}`).then(function (select) {
+            waitForElement(`#select-${allocation.eid}`).then(function (select: HTMLElement) {
               select.innerHTML = candidateList.map(candidate => {
                 const combinationLabel = getCombinationLabel(candidateList, candidate.ordinal);
 
@@ -217,7 +219,7 @@ const setAllocationsAndConfirmations = () => {
       handleExperimentRowClicks();
     } else {
       const noAllocationsEl = document.querySelector('.experiment_row[data-allocation="none"]');
-      waitForElement("#experiment-section").then(function (experimentList) {
+      waitForElement("#experiment-section").then(function (experimentList: HTMLElement) {
         if (!!experimentList && !noAllocationsEl) {
           experimentList.insertAdjacentHTML("beforeend", `<div class="experiment_row hide-info" data-allocation="none"><p style="padding-left: 10px">No active projects</p></div>`);
         }
@@ -235,20 +237,22 @@ const getCombinationLabel = (candidates: Candidate[], ordinal: number) => {
 
 const setPreviewCid = (cid: string) => {
   sendMessage({ message: 'set_preview_cid', cid });
+  sendMessage({ message: 'evolv_popup_closed' });
   window.close();
 }
 
 const clearPreviewCid = () => {
   sendMessage({ message: 'clear_preview_cid' });
+  sendMessage({ message: 'evolv_popup_closed' });
   window.close();
 }
 
 const handleCopyButtonClicks = () => {
-  waitForElement('#copy-debug-info').then(function (copyButton) {
+  waitForElement('#copy-debug-info').then(function (copyButton: HTMLElement) {
     copyButton.addEventListener('click', function () {
       const currentInnerHTML = copyButton.innerHTML;
       // add remoteContext string to the clipboard
-      var data = [new ClipboardItem({
+      const data = [new ClipboardItem({
         "text/plain": new Blob([JSON.stringify(remoteContext)], {
           type: "text/plain"
         })
@@ -266,8 +270,8 @@ const handleCopyButtonClicks = () => {
   });
 };
 
-const handleClearSelectionClicks = async () => {
-  waitForElement('#clear-selection').then(function (clear) {
+const handleClearSelectionClicks = () => {
+  waitForElement('#clear-selection').then(function (clear: HTMLElement) {
     usePreviewId ? clear.classList.add('active') : clear.classList.remove('active');
 
     clear.addEventListener('click', function () {
@@ -277,19 +281,43 @@ const handleClearSelectionClicks = async () => {
 }
 
 const setBlockExecutionStatus = (blockExecutionValue: BlockExecution) => {
-  waitForElement("#block-execution-toggle input").then(function (toggleInput) {
-    blockExecutionValue
-      ? toggleInput.checked = false
-      : toggleInput.checked = true;
+  waitForElement("#block-execution-toggle input").then(function (toggleInput: HTMLInputElement) {
+    switch (blockExecutionValue) {
+      case strings.snippet.disabled:
+        toggleInput.checked = false;
+        toggleInput.nextElementSibling.classList.add('disabled');
+        toggleInput.removeAttribute('disabled');
+        toggleInput.parentElement.previousElementSibling.textContent = strings.snippet.disabled;
+        snippetIsDisabled = true;
+        removeAllocations();
+        break;
 
-    toggleInput.addEventListener('click', function (e: any) {
+      case strings.snippet.enabled:
+        toggleInput.checked = true;
+        toggleInput.nextElementSibling.classList.remove('disabled');
+        toggleInput.removeAttribute('disabled');
+        toggleInput.parentElement.previousElementSibling.textContent = strings.snippet.enabled;
+        snippetIsDisabled = false;
+        setAllocationsAndConfirmations();
+        break;
+
+      case strings.snippet.notDetected:
+        toggleInput.checked = false;
+        toggleInput.nextElementSibling.classList.add('disabled');
+        toggleInput.setAttribute('disabled', 'true');
+        toggleInput.parentElement.previousElementSibling.textContent = strings.snippet.notDetected;
+        removeAllocations();
+        break;
+    }
+
+    toggleInput.addEventListener('click', function (e: MouseEvent) {
       removeAllocations();
       if (!toggleInput.checked) {
         sendMessage({ message: 'disable_evolv' });
-        e.target.parentElement.previousElementSibling.textContent = 'Snippet Disabled';
+        (e.target as HTMLElement).parentElement.previousElementSibling.textContent = strings.snippet.disabled;
       } else {
         sendMessage({ message: 'enable_evolv' });
-        e.target.parentElement.previousElementSibling.textContent = 'Snippet Enabled';
+        (e.target as HTMLElement).parentElement.previousElementSibling.textContent = strings.snippet.enabled;
       }
     });
   });
@@ -335,7 +363,7 @@ const setEvents = () => {
       for (let i = events.length; i >= 0; i--) {
         const event = events[i];
 
-        waitForElement("#events-section").then(function (eventsList) {
+        waitForElement("#events-section").then(function (eventsList: HTMLElement) {
           const eventName = event.type;
           const eventTime = new Date(event.timestamp).toLocaleTimeString();
           const eventUniqueKey = `${eventName}.${event.timestamp}`;
@@ -365,7 +393,7 @@ const setEvents = () => {
 
     } else {
       const noEventsEl = document.querySelector('.event-row[data-event-key="none"]');
-      waitForElement("#events-section").then(function (eventsList) {
+      waitForElement("#events-section").then(function (eventsList: HTMLElement) {
         if (!!eventsList && !noEventsEl) {
           eventsList.insertAdjacentHTML("beforeend", `<div class="event-row" data-event-key="none"><p>No events</p></div>`);
         }
@@ -374,10 +402,10 @@ const setEvents = () => {
   }
 };
 
-const setConfig = async () => {
+const setConfig = (stage: Stage) => {
   if (environmentId) {
     try {
-      chrome.runtime.sendMessage({type: 'evolv:environmentConfig', envId: environmentId}, response => {
+      chrome.runtime.sendMessage({type: 'evolv:environmentConfig', envId: environmentId, stage}, response => {
         if (response.data) {
           const experiments = response.data._experiments;
 
@@ -387,7 +415,7 @@ const setConfig = async () => {
             }
           }
         } else {
-          console.error("Fetch environment config failed: ", response.error);
+          console.error("Fetch environment config error: ", response.error);
         }
 
         setAllocationsAndConfirmations();
@@ -413,11 +441,12 @@ setInterval(() => {
 chrome.runtime.onMessage.addListener((msg) => {
   switch (msg.message) {
     case 'evolv:remoteContext':
+      snippetIsDisabled = msg.data.snippetIsDisabled;
       setAllocationsAndConfirmations();
       break;
 
     case 'evolv:blockExecution':
-      setBlockExecutionStatus(msg.data);
+      setBlockExecutionStatus(msg.data.blockExecution);
       break;
 
     case 'evolv:initialData':
@@ -429,7 +458,7 @@ chrome.runtime.onMessage.addListener((msg) => {
       setEnvironmentValue(environmentId);
       setBlockExecutionStatus(msg.data.blockExecution);
       setUidValue(msg.data.uid);
-      setConfig();
+      setConfig(msg.data.stage);
       setEvents();
       break;
   }

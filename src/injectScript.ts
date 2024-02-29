@@ -29,17 +29,18 @@ function experimentsNameAssigner () {
 }
 
 const addENameToContext = experimentsNameAssigner();
+const snippetIsDisabled: boolean = !!(window.sessionStorage.getItem('evolv:blockExecution')) || false;
 
 async function sendContext() {
     const experimentNames = await addENameToContext();
-
     window.postMessage({
         source: 'evoTools',
         type: 'evolv:context',
         data: {
             ...evolv.context.remoteContext,
             experimentNames
-        }
+        },
+        snippetIsDisabled
     }, '*')
 }
 
@@ -47,7 +48,8 @@ function sendEmptyContext() {
     window.postMessage({
         source: 'evoTools',
         type: 'evolv:context',
-        data: ('empty')
+        data: ('empty'),
+        snippetIsDisabled
     }, '*')
 }
 

@@ -1,9 +1,10 @@
 {
-  "name": "chrome-extension",
-  "version": "1.0.0",
+  "name": "@evolv/chrome-extension",
+  "version": "1.3.0",
   "description": "## Getting Started --- #### **1)** In this Github project, click the green `Code` button and choose `Download ZIP`.  Save the zip file somewhere that you're not going to delete it by accident.  Once downloaded, open the zip file and you should see a directory named `evotools-main`. <img src=\"https://imgur.com/8hvUBj4.png\"/>",
   "main": "src/background.js",
   "type": "module",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm-run-all build:*",

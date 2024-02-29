@@ -594,18 +594,28 @@ select {
   background-color: #ccc;
   -webkit-transition: .4s;
   transition: .4s;
+
+  &:before {
+    position: absolute;
+    content: "";
+    height: 21px;
+    width: 21px;
+    left: 0;
+    bottom: -3px;
+    background-color: #fff;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+
+  &.disabled, &.disabled:before {
+    transition: none;
+    -webkit-transition: none;
+    cursor: default;
+  }
 }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 21px;
-  width: 21px;
-  left: 0;
-  bottom: -3px;
-  background-color: #fff;
-  -webkit-transition: .4s;
-  transition: .4s;
+#block-execution-toggle > .switch:hover {
+  box-shadow: none;
 }
 
 .switch:hover .slider:before {

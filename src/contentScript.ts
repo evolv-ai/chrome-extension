@@ -1,13 +1,15 @@
 import { waitForElement } from './shared/utils';
-import { InitData } from './types';
+import { InitData, Stage } from './types';
+import { strings } from './shared/variables';
 
 
 const initData: InitData = {
     remoteContext: {},
     envID: '',
     uid: '',
-    blockExecution: null,
-    previewCid: null
+    previewCid: null,
+    stage: null,
+    snippetIsDisabled: true
 };
 let isPopupOpen = false
 
@@ -16,7 +18,7 @@ const injectScript = () => {
         return;
     }
 
-    var script = document.createElement('script');
+    const script = document.createElement('script');
     script.src = chrome.runtime.getURL('injectScript.js');
     script.id = 'evolvTools:injectedScript';
     document.body.appendChild(script);
@@ -26,13 +28,50 @@ window.addEventListener("load", () => {
     injectScript()
 });
 
-waitForElement('script[src*="evolv.ai/asset-manager"]').then(script => {
-    initData.envID = script.dataset.evolvEnvironment;
-});
+const getStage = (evolvEndpoint: string): Stage => {
+    if (evolvEndpoint.includes('-stg')) {
+        return Stage.Staging;
+    }
+
+    if (evolvEndpoint.includes('-dev')) {
+        return Stage.Development;
+    }
+
+    return Stage.Production;
+}
+
+/**
+ * Check for evolv:blockExecution BEFORE looking for the script
+ * If found, we know the script is disabled
+ * If not found, we assume the script is not detected
+ * If we found the script, we know the snippet exists, so it is either enabled or disabled
+ * We check for evolv:blockExecution to determine which
+ */
+const waitForEvolv = async () => {
+    initData.blockExecution = window.sessionStorage.getItem('evolv:blockExecution')
+      ? strings.snippet.disabled
+      : strings.snippet.notDetected;
+
+    try {
+        const script: HTMLScriptElement | unknown = await waitForElement('script[src*="evolv.ai/asset-manager"]');
+
+        if (script instanceof HTMLScriptElement) {
+            initData.envID = script.dataset.evolvEnvironment;
+            const evolvEndpoint = script.dataset.evolvEndpoint;
+            initData.stage = getStage(evolvEndpoint);
+            initData.blockExecution = window.sessionStorage.getItem('evolv:blockExecution')
+              ? strings.snippet.disabled
+              : strings.snippet.enabled;
+
+            await chrome.runtime.sendMessage({ message: 'evolv:initialData', data: initData });
+        }
+    } catch {
+        console.log('Evolv AI snippet not detected');
+    }
+}
 
 const bootstrap = () => {
     initData.uid = window.localStorage.getItem('evolv:uid') || '(empty)';
-    initData.blockExecution = window.sessionStorage.getItem('evolv:blockExecution') || null;
     initData.previewCid = window.sessionStorage.getItem('evolv:previewCid') || null;
 
     chrome.runtime.sendMessage({ message: 'evolv:initialData', data: initData });
@@ -46,8 +85,10 @@ window.addEventListener('message', (e) => {
     switch (e.data.type) {
         case 'evolv:context':
             initData.remoteContext = e.data.data;
+            initData.snippetIsDisabled = e.data.snippetIsDisabled;
+
             if (isPopupOpen){
-                chrome.runtime.sendMessage({ message: 'evolv:remoteContext' });
+                chrome.runtime.sendMessage({ message: 'evolv:remoteContext', data: initData });
             }
             break;
     }
@@ -74,6 +115,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 source: 'evoTools',
                 type: 'evolv:refreshContext'
             }, '*');
+            waitForEvolv();
             bootstrap();
             break;
 
