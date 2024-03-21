@@ -35,7 +35,7 @@ export interface InitData {
 	uid: string;
 	blockExecution?: BlockExecution;
 	previewCid: string | null;
-	stage: Stage | null;
+	stage: Stage | undefined;
 	snippetIsDisabled: boolean;
 }
 

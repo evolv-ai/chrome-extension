@@ -29,6 +29,10 @@ window.addEventListener("load", () => {
 });
 
 const getStage = (evolvEndpoint: string): Stage => {
+    if (!evolvEndpoint) {
+        return Stage.Production;
+    }
+
     if (evolvEndpoint.includes('-stg')) {
         return Stage.Staging;
     }
