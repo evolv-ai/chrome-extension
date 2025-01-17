@@ -1,6 +1,6 @@
 {
   "name": "@evolv/chrome-extension",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "## Getting Started --- #### **1)** In this Github project, click the green `Code` button and choose `Download ZIP`.  Save the zip file somewhere that you're not going to delete it by accident.  Once downloaded, open the zip file and you should see a directory named `evotools-main`. <img src=\"https://imgur.com/8hvUBj4.png\"/>",
   "main": "src/background.js",
   "type": "module",
@@ -15,7 +15,8 @@
     "watch": "npm-run-all --parallel watch:*",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
-    "prewatch": "npm run clean"
+    "prewatch": "npm run clean",
+    "start": "npm run watch"
   },
   "repository": {
     "type": "git",
@@ -35,6 +36,7 @@
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-sass": "^1.12.21",
     "sass": "^1.70.0",
+    "tslib": "^2.8.1",
     "typescript": "^5.3.3"
   }
 }

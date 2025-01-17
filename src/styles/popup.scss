@@ -4,7 +4,15 @@
   --main-font-color: #000000;
   --border-color: #dddddd;
   --tooltip-border-color: #777777;
+  --color-ghost: rgba(255, 255, 255, 0.1);
   --header-z-index: 100;
+  --font-size-body: 0.75rem;
+
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
 }
 
 /******* font start *******/
@@ -182,6 +190,7 @@ body {
   margin: 0;
   font-family: Roboto, Arial, sans-serif;
   font-weight: 300;
+  font-size: var(--font-size-body);
 }
 
 button {
@@ -210,6 +219,8 @@ button {
   z-index: var(--header-z-index);
   position: sticky;
   top: 0;
+  gap: 8px;
+  padding: 0 8px;
 }
 
 .section-header.allocations-title, .section-header.events-title {
@@ -259,7 +270,7 @@ button {
 }
 
 #header-row .logo {
-  margin: 15px 0 15px 21px;
+  margin: 15px 0 15px 13px;
 }
 
 button.settings-icon {
@@ -290,30 +301,61 @@ button.refresh-icon {
   color: var(--main-font-color);
 }
 
-#copy-debug-info {
-  margin: 10px;
+#reset-session {
+  width: max-content;
+  margin: 7px 0;
+  padding: 4px 10px;
   border: 1px solid #fff;
   border-radius: 4px;
-  width: 120px;
   color: #fff;
-  transition: 1s;
   position: relative;
-  opacity: .85;
+  opacity: 1;
+  font-size: .875rem;
   font-weight: bold;
   cursor: pointer;
   background-color: transparent;
   height: calc(var(--header-height) - 20);
 }
 
-.copy-icon {
-  fill: #fff;
+#reset-session:hover,
+#reset-session:focus,
+#reset-session:active {
+  background-color: var(--color-ghost);
 }
 
-button#copy-debug-info svg {
+#copy-debug-info {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 25px;
+  width: auto;
+  color: #fff;
+  transition: color 1s;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: transparent;
+  height: calc(var(--header-height) - 20);
+  padding: 0;
+}
+
+.copy-debug-info-hit-area {
   position: absolute;
-  transform: translateY(-50%);
   top: 50%;
-  left: 10px;
+  left: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  transform: translate(-50%, -50%);
+}
+
+.copy-debug-info-hit-area:hover {
+  background-color: var(--color-ghost);
+}
+
+.copy-icon {
+  fill: #fff;
 }
 
 button#copy-debug-info span {
@@ -369,7 +411,7 @@ button#copy-debug-info span {
 
 h2 {
   width: 100%;
-  font-size: 1em;
+  font-size: var(--font-size-body);
   padding: 10px;
   margin: 0;
 }
@@ -393,9 +435,8 @@ h2 {
   border-bottom: none;
 }
 
-.section-header:not(:first-of-type) {
-  height: 40px;
-  line-height: 21px;
+.section-header {
+  line-height: 1.25rem;
 }
 
 .experiment_row ul {
@@ -554,6 +595,7 @@ select {
   border-radius: 4px;
   width: 100%;
   margin-right: 10px;
+  font-size: var(--font-size-body);
 }
 
 /* TOGGLE SWITCH */
@@ -562,11 +604,12 @@ select {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  width: calc(100% - 150px);
+  flex-grow: 1;
+  gap: 10px;
   margin-right: 10px;
 }
 #block-execution-toggle p {
-  margin-right: 10px;
+  font-size: var(--font-size-body);
 }
 
 .switch {
@@ -662,23 +705,30 @@ input:checked+.slider:before {
 .tooltip:hover .tooltip-message {
   display: block;
   position: absolute;
-  top: calc(-1 * (var(--header-height) - 4px));
-  right: 13%;
+  top: calc(-1*(var(--header-height) - 1px));
+  right: -9%;
   width: 150px;
   background: white;
   border: var(--tooltip-border-color) solid 1px;
-  padding: 4px;
+  padding: 6px;
   border-radius: 6px;
   z-index: 100;
+  font-size: .688rem;
+  line-height: 1.25;
 }
 
 .tooltip-message:before {
   content: "";
-  border: transparent 6px solid;
-  border-top: var(--tooltip-border-color) solid 6px;
+  border: transparent 1px solid;
+  border-bottom: var(--tooltip-border-color) solid 1px;
+  border-right: 1px solid var(--tooltip-border-color);
   position: absolute;
-  bottom: -13px;
-  right: 3px;
+  bottom: -4.1px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  background: white;
 }
 
 .tooltip-arrow {

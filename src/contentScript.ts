@@ -140,5 +140,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             window.sessionStorage.removeItem('evolv:previewCid');
             window.location.reload();
             break;
+
+        case 'reset_evolv_uid':
+            window.localStorage.removeItem('evolv:uid');
+            window.location.reload();
+            break;
     }
 });
