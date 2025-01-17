@@ -247,6 +247,14 @@ const clearPreviewCid = () => {
   window.close();
 }
 
+const handleResetSessionClicks = () => {
+  waitForElement('#reset-session').then(function (resetButton: HTMLElement) {
+    resetButton.addEventListener('click', function () {
+      sendMessage({ message: 'reset_evolv_uid' });
+    });
+  });
+}
+
 const handleCopyButtonClicks = () => {
   waitForElement('#copy-debug-info').then(function (copyButton: HTMLElement) {
     copyButton.addEventListener('click', function () {
@@ -430,6 +438,7 @@ const setConfig = (stage: Stage) => {
 
 let run = () => {
   sendMessage({ message: 'initialize_evoTools' });
+  handleResetSessionClicks();
   handleCopyButtonClicks();
 }
 

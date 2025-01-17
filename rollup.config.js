@@ -19,6 +19,9 @@ export default [
 				]
 			})
 		],
+		watch: {
+			include: ['public/**/*', 'manifest.json']
+		}
 	},
 	{
 		input: 'src/contentScript.ts',
