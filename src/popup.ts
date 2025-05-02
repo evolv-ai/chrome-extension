@@ -88,7 +88,9 @@ const handleSettingsButtonClicks = () => {
 const setAllocationsAndConfirmations = () => {
   if (remoteContext && remoteContext.experiments && !snippetIsDisabled) {
     const allocations = remoteContext.experiments.allocations;
-    const confirmations = remoteContext.experiments.confirmations;
+    const confirmationsStandard = remoteContext.experiments.confirmations ?? [];
+    const confirmationsInternal = remoteContext.experiments.confirmationsinternal ?? [];
+    const confirmations = [...confirmationsStandard, ...confirmationsInternal];
     const experimentNames = remoteContext.experimentNames;
 
     let confirmationCIDs: string[] = [];
