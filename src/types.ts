@@ -2,7 +2,7 @@ export type Experiments = {
 	allocations: Allocation[];
 	exclusions: string[];
 	confirmations: Confirmation[];
-	confirmationsinternal: Confirmation[];
+	confirmationsInternal: Confirmation[];
 }
 
 export interface Allocation {

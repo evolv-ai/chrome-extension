@@ -89,7 +89,7 @@ const setAllocationsAndConfirmations = () => {
   if (remoteContext && remoteContext.experiments && !snippetIsDisabled) {
     const allocations = remoteContext.experiments.allocations;
     const confirmationsStandard = remoteContext.experiments.confirmations ?? [];
-    const confirmationsInternal = remoteContext.experiments.confirmationsinternal ?? [];
+    const confirmationsInternal = remoteContext.experiments.confirmationsInternal ?? [];
     const confirmations = [...confirmationsStandard, ...confirmationsInternal];
     const experimentNames = remoteContext.experimentNames;
 
