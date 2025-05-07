@@ -37,7 +37,7 @@ const getStage = (evolvEndpoint: string): Stage => {
         return Stage.Staging;
     }
 
-    if (evolvEndpoint.includes('-dev')) {
+    if (evolvEndpoint.includes('-newdev')) {
         return Stage.Development;
     }
 
@@ -57,7 +57,7 @@ const waitForEvolv = async () => {
       : strings.snippet.notDetected;
 
     try {
-        const script: HTMLScriptElement | unknown = await waitForElement('script[src*="evolv.ai/asset-manager"]');
+        const script: HTMLScriptElement | unknown = await waitForElement('script[src*="evolv.ai/asset-manager"], script[src*="localhost"][src*="webloader"]');
 
         if (script instanceof HTMLScriptElement) {
             initData.envID = script.dataset.evolvEnvironment;
