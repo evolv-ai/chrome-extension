@@ -47,6 +47,12 @@ const setUidValue = (uid: string) => {
   });
 };
 
+const setInternalUserIndicator = () => {
+  waitForElement("#evolv_internal_user_indicator").then(function (indicator: HTMLElement) {
+    indicator.textContent = '-[internal]';
+  });
+};
+
 const setEnvironmentValue = (value: string) => {
   waitForElement("#envID").then(function (envInput: HTMLElement) {
       envInput.textContent = value || '(not set)';
@@ -417,6 +423,10 @@ const setConfig = (stage: Stage) => {
     try {
       chrome.runtime.sendMessage({type: 'evolv:environmentConfig', envId: environmentId, stage}, response => {
         if (response.data) {
+          if (response.data._internal_user) {
+            setInternalUserIndicator();
+          }
+
           const experiments = response.data._experiments;
 
           if (experiments && experiments.length) {
