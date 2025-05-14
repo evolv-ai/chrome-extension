@@ -439,10 +439,6 @@ const setConfig = (stage: Stage, uid: string) => {
     try {
       chrome.runtime.sendMessage({ type: 'evolv:environmentConfig', envId: environmentId, stage }, response => {
         if (response.data) {
-          if (response.data._internal_user) {
-            setInternalUserIndicator();
-          }
-
           const experiments = response.data._experiments;
 
           if (experiments && experiments.length) {
