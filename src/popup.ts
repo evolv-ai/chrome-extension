@@ -418,10 +418,26 @@ const setEvents = () => {
   }
 };
 
-const setConfig = (stage: Stage) => {
+const setConfig = (stage: Stage, uid: string) => {
   if (environmentId) {
+    if (uid) {
+      try {
+        chrome.runtime.sendMessage({ type: 'evolv:userConfig', envId: environmentId, stage, uid }, response => {
+          if (response.data) {
+            if (response.data._internal_user) {
+              setInternalUserIndicator();
+            }
+          } else {
+            console.error("Fetch user config error: ", response.error);
+          }
+        });
+      } catch (error) {
+        console.error("Fetch user config failed: ", error);
+      }
+    }
+
     try {
-      chrome.runtime.sendMessage({type: 'evolv:environmentConfig', envId: environmentId, stage}, response => {
+      chrome.runtime.sendMessage({ type: 'evolv:environmentConfig', envId: environmentId, stage }, response => {
         if (response.data) {
           if (response.data._internal_user) {
             setInternalUserIndicator();
@@ -478,8 +494,9 @@ chrome.runtime.onMessage.addListener((msg) => {
       handleClearSelectionClicks();
       setEnvironmentValue(environmentId);
       setBlockExecutionStatus(msg.data.blockExecution);
-      setUidValue(msg.data.uid);
-      setConfig(msg.data.stage);
+      const uid = msg.data.uid
+      setUidValue(uid);
+      setConfig(msg.data.stage, uid);
       setEvents();
       break;
   }
