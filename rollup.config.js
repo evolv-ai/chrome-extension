@@ -1,6 +1,7 @@
 import typescript from '@rollup/plugin-typescript';
 import copy from "rollup-plugin-copy";
 import sass from 'rollup-plugin-sass';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 export default [
 	{
@@ -43,8 +44,12 @@ export default [
 		input: 'src/popup.ts',
 		output: {
 			file: 'dist/popup.js',
-			format: 'cjs'
+			format: 'iife',
+			name: 'popup'
 		},
-		plugins: [typescript()]
+		plugins: [
+			nodeResolve(),
+			typescript()
+		]
 	}
 ]

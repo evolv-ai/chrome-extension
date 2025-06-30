@@ -5,9 +5,13 @@
   "manifest_version": 3,
   "host_permissions": [
     "https://participants.evolv.ai/*",
-    "https://participants-stg.evolv.ai/*"
+    "https://participants-stg.evolv.ai/*",
+    "https://*.auth0.com/*"
   ],
-  "permissions": [],
+  "permissions": [
+    "identity",
+    "storage"
+  ],
   "background": {
     "service_worker": "background.js"
   },

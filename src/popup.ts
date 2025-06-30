@@ -1,6 +1,7 @@
 import { waitForElement } from './shared/utils';
 import { BlockExecution, Candidate, Confirmation, RemoteContext, Stage } from './types';
 import { strings } from './shared/variables';
+import { Login } from './components/Login';
 
 let remoteContext: RemoteContext = {};
 let environmentId = '';
@@ -8,6 +9,12 @@ let experimentCandidates = new Map;
 let evolvUserId = '';
 let usePreviewId = false;
 let snippetIsDisabled = false;
+
+// Initialize authentication
+const login = new Login();
+login.initialize().catch(error => {
+  console.error('Failed to initialize authentication:', error);
+});
 
 // message plus any number of optional props
 
